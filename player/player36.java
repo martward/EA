@@ -13,15 +13,15 @@ public class player36 implements ContestSubmission
     Population population;
     Random rnd_;
     ContestEvaluation evaluation_;
-    //EA algorithm;
+    EA algorithm;
     private int evaluations_limit_;
     private int maxIterations;
     double selectionPressure = 1;
     int numParents = populationSize/10;
 	
 	public player36()
-	{
-        EA al;
+    {
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10);
 		rnd_ = new Random();
         //algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, selectionPressure, numParents);
 	}
@@ -67,33 +67,16 @@ public class player36 implements ContestSubmission
 
         while(its < maxIterations) {
             population.evaluate();
-            /*
+
             selection = algorithm.select(population);
+
+
             childeren = algorithm.recombine(selection);
+            /*
             population = algorithm.kill(population, childeren);
             */
-
             System.out.println(population);
+            its++;
         }
 	}
-
-    public static void main(String [] args) {
-        Runtime r = Runtime.getRuntime();
-        try {
-            Process p = r.exec("java -jar testrun.jar -submission=player36 -evaluation=SphereEvaluation -seed=1");
-            p.waitFor();
-            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            String line = "";
-
-            while ((line = b.readLine()) != null) {
-                System.out.println(line);
-            }
-
-            b.close();
-        } catch(Exception e)
-        {
-
-        }
-    }
 }

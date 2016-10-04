@@ -14,6 +14,13 @@ public class Population {
     private final int size;
     private ArrayList<Individual> population;
 
+    public Population(ArrayList<Individual> population, ContestEvaluation evaluation)
+    {
+        this.population = population;
+        this.size = population.size();
+        this.evaluation = evaluation;
+    }
+
     public Population(int size, ContestEvaluation evaluation)
     {
         this.evaluation = evaluation;
@@ -58,5 +65,19 @@ public class Population {
             string += individual.toString() + "\n";
         }
         return string;
+    }
+
+    public Population getTopN(int n){
+        ArrayList<Individual> top = new ArrayList<>(population.subList(0, n));
+
+        return new Population(top, evaluation);
+    }
+
+    public int getPopSize(){
+        return population.size();
+    }
+
+    public Individual getIndividual(int i){
+        return population.get(i);
     }
 }

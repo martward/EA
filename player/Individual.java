@@ -12,6 +12,10 @@ public class Individual {
 
     private double parameters[] = new double[paramSize];
 
+    public Individual(double params[]){
+        parameters = params;
+    }
+
     public Individual()
     {
         initParams();
