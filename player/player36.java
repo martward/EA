@@ -1,21 +1,29 @@
 import org.vu.contest.ContestSubmission;
 import org.vu.contest.ContestEvaluation;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Random;
 import java.util.Properties;
 
 public class player36 implements ContestSubmission
 {
-	Random rnd_;
-	ContestEvaluation evaluation_;
-    private int evaluations_limit_;
-    private static final int populationSize = 1000;
+    private static final int populationSize = 100;
 
-    private Individual[] individuals;
+    Population population;
+    Random rnd_;
+    ContestEvaluation evaluation_;
+    //EA algorithm;
+    private int evaluations_limit_;
+    private int maxIterations;
+    double selectionPressure = 1;
+    int numParents = populationSize/10;
 	
 	public player36()
 	{
+        EA al;
 		rnd_ = new Random();
+        //algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, selectionPressure, numParents);
 	}
 
 	public void setSeed(long seed)
@@ -33,6 +41,7 @@ public class player36 implements ContestSubmission
 		Properties props = evaluation.getProperties();
         // Get evaluation limit
         evaluations_limit_ = Integer.parseInt(props.getProperty("Evaluations"));
+        maxIterations = evaluations_limit_/populationSize;
 		// Property keys depend on specific evaluation
 		// E.g. double param = Double.parseDouble(props.getProperty("property_name"));
         boolean isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
@@ -49,11 +58,42 @@ public class player36 implements ContestSubmission
 
 	public void run()
     {
-        System.out.println(evaluations_limit_);
+        int its = 0;
+        population = new Population(populationSize, evaluation_);
+        Population selection;
+        Population childeren;
+
+        maxIterations = 1;
+
+        while(its < maxIterations) {
+            population.evaluate();
+            /*
+            selection = algorithm.select(population);
+            childeren = algorithm.recombine(selection);
+            population = algorithm.kill(population, childeren);
+            */
+
+            System.out.println(population);
+        }
 	}
 
-    private void initPopulation()
-    {
-        individuals = new Individual[populationSize];
+    public static void main(String [] args) {
+        Runtime r = Runtime.getRuntime();
+        try {
+            Process p = r.exec("java -jar testrun.jar -submission=player36 -evaluation=SphereEvaluation -seed=1");
+            p.waitFor();
+            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+
+            while ((line = b.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            b.close();
+        } catch(Exception e)
+        {
+
+        }
     }
 }

@@ -1,12 +1,14 @@
-import java.util.Random;
-
 /**
  * Created by sebastien on 4-10-16.
  */
+
+
 public class Individual {
 
-    int paramSize = 0;
+    int paramSize = 10;
     int paramLimits[] = {-50000, 50000};
+
+    private double fitness = 0;
 
     private double parameters[] = new double[paramSize];
 
@@ -29,5 +31,18 @@ public class Individual {
 
     public void setParameters(double[] parameters) {
         this.parameters = parameters;
+    }
+
+    public double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    public String toString()
+    {
+        return "Fitness: " + fitness + " (" + parameters + ")";
     }
 }
