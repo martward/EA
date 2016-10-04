@@ -4,20 +4,23 @@ import org.vu.contest.ContestEvaluation;
 import java.util.Random;
 import java.util.Properties;
 
-public class player0 implements ContestSubmission
+public class player36 implements ContestSubmission
 {
 	Random rnd_;
 	ContestEvaluation evaluation_;
     private int evaluations_limit_;
+    private static final int populationSize = 1000;
+
+    private Individual[] individuals;
 	
-	public player0()
+	public player36()
 	{
 		rnd_ = new Random();
 	}
-	
+
 	public void setSeed(long seed)
 	{
-		// Set seed of algortihms random process
+		// Set seed of algorithms random process
 		rnd_.setSeed(seed);
 	}
 
@@ -25,7 +28,7 @@ public class player0 implements ContestSubmission
 	{
 		// Set evaluation problem used in the run
 		evaluation_ = evaluation;
-		
+
 		// Get evaluation properties
 		Properties props = evaluation.getProperties();
         // Get evaluation limit
@@ -43,23 +46,14 @@ public class player0 implements ContestSubmission
             // Do sth else
         }
     }
-    
-	public void run()
-	{
-		// Run your algorithm here
-        
-        int evals = 0;
-        // init population
-        // calculate fitness
-        while(evals<evaluations_limit_){
-            // Select parents
-            // Apply crossover / mutation operators
-            double child[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-            // Check fitness of unknown fuction
-            Double fitness = (double) evaluation_.evaluate(child);
-            evals++;
-            // Select survivors
-        }
 
+	public void run()
+    {
+        System.out.println(evaluations_limit_);
 	}
+
+    private void initPopulation()
+    {
+        individuals = new Individual[populationSize];
+    }
 }
