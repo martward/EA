@@ -46,7 +46,7 @@ public class Population {
         }
         Collections.sort(population, new Comparator<Individual>() {
             @Override
-            public int compare(Individual individual, Individual t1) {
+            public int compare(Individual t1, Individual individual) {
                 return Double.compare(individual.getFitness(), t1.getFitness());
             }
         });
@@ -68,7 +68,7 @@ public class Population {
     }
 
     public Population getTopN(int n){
-        ArrayList<Individual> top = new ArrayList<>(population.subList(0, n));
+        ArrayList<Individual> top = new ArrayList<>(population.subList(size-n-1, size-1));
 
         return new Population(top, evaluation);
     }

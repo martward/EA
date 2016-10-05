@@ -63,7 +63,7 @@ public class player36 implements ContestSubmission
         Population selection;
         Population childeren;
 
-        maxIterations = 1;
+        maxIterations = 10;
 
         while(its < maxIterations) {
             population.evaluate();
@@ -72,9 +72,9 @@ public class player36 implements ContestSubmission
 
 
             childeren = algorithm.recombine(selection);
-            /*
+
             population = algorithm.kill(population, childeren);
-            */
+
             System.out.println(population);
             its++;
         }

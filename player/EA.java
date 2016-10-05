@@ -45,8 +45,17 @@ public class EA {
     }
 
     public Population kill(Population population, Population children){
+        ArrayList<Integer>killed = new ArrayList<>(children.getPopSize());
+        for(int i = 0; i < children.getPopSize();i++){
+            int toKill = -1;
+            while(toKill == -1 || killed.contains(toKill)){
+                toKill = (int )(Math.random() * population.getPopSize());
+            }
+            killed.add(toKill);
+            population.getIndividual(toKill).replace(children.getIndividual(i).getParameters());
+        }
 
-        return null;
+        return population;
     }
 
     public Population mutation(Population population){

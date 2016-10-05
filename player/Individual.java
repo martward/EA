@@ -49,4 +49,8 @@ public class Individual {
     {
         return "Fitness: " + fitness + " (" + parameters + ")";
     }
+
+    public void replace(double params[]){
+        parameters = params;
+    }
 }
