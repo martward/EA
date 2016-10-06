@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class player36 implements ContestSubmission
 {
-    private static final int populationSize = 100;
+    private static final int populationSize = 50;
 
     Population population;
     Random rnd_;
@@ -59,7 +59,7 @@ public class player36 implements ContestSubmission
         System.out.println("maxIts: " + maxIterations);
 
         algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
-                EA.MUTATION_TYPE.REINIT,
+                EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                 EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                 EA.KILL_TYPE.WORST,
                 1.5,numParents);
@@ -77,7 +77,7 @@ public class player36 implements ContestSubmission
 
         //maxIterations = 10;
         while(its < maxIterations) {
-            rate = its/maxIterations;
+            rate = (double)its/(double)maxIterations;
 
             selection = algorithm.select(population);
 
