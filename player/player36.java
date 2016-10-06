@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class player36 implements ContestSubmission
 {
-    private static final int populationSize = 100;
+    private static final int populationSize = 40;
 
     Population population;
     Random rnd_;
@@ -17,11 +17,10 @@ public class player36 implements ContestSubmission
     private int evaluations_limit_;
     private int maxIterations;
     double selectionPressure = 1;
-    int numParents = populationSize/10;
+    int numParents = (int) populationSize/2;
 	
 	public player36()
     {
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10, EA.RECOMBINATION_TYPES.UNIFORMCROSSOVER);
 		rnd_ = new Random();
 	}
 
@@ -52,6 +51,13 @@ public class player36 implements ContestSubmission
         }else{
             // Do sth else
         }
+
+
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
+                EA.MUTATION_TYPE.REINIT,
+                EA.RECOMBINATION_TYPES.SIMPLE_ARITHMETIC,
+                EA.KILL_TYPE.WORST,
+                1.5,numParents);
     }
 
 	public void run()
@@ -61,10 +67,10 @@ public class player36 implements ContestSubmission
         population.evaluate();
         Population selection;
         Population children;
+        double rate;
 
-
-        maxIterations = 50;
         while(its < maxIterations) {
+            rate = its/maxIterations;
 
             selection = algorithm.select(population);
 
@@ -72,12 +78,11 @@ public class player36 implements ContestSubmission
 
             population = algorithm.kill(population, children);
 
-            population = algorithm.mutation(population);
+            population = algorithm.mutation(population, rate);
 
             population.evaluate();
-            System.out.println(population.getIndividual(0).getFitness());
 
-            //System.out.println(population);
+            System.out.println(population.getIndividual(0));
 
             its++;
         }

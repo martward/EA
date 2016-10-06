@@ -80,4 +80,9 @@ public class Population {
     public Individual getIndividual(int i){
         return population.get(i);
     }
+
+    public ArrayList<Individual> getPopulation()
+    {
+        return population;
+    }
 }
