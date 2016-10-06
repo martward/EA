@@ -9,6 +9,7 @@ public class EA {
     private final SELECTION_TYPES selectionType;
     private final double selectionPressure;
     private final int numParents;
+    private final double pMutate = 0.5;
 
     public enum SELECTION_TYPES {
         UNIFORM, TOURNAMENT, ROULETTE, STOCHASTIC
@@ -62,7 +63,13 @@ public class EA {
     }
 
     public Population mutation(Population population){
-
-        return null;
+        for (int i = numParents; i < population.getPopSize(); i++)
+        {
+            if (Math.random() < pMutate)
+            {
+                population.getIndividual(i).initParams();
+            }
+        }
+        return population;
     }
 }

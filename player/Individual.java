@@ -21,7 +21,7 @@ public class Individual {
         initParams();
     }
 
-    private void initParams()
+    public void initParams()
     {
         for (int i = 0; i < paramSize; i++)
         {
