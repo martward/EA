@@ -21,7 +21,7 @@ public class player36 implements ContestSubmission
 	
 	public player36()
     {
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10);
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, EA.MUTATION_TYPE.GAUSSIAN_NOISE, 1.5,10);
 		rnd_ = new Random();
 	}
 
@@ -62,10 +62,12 @@ public class player36 implements ContestSubmission
         population.evaluate();
         Population selection;
         Population children;
+        double rate;
 
         //maxIterations = 10;
 
         while(its < maxIterations) {
+            rate = its/maxIterations;
 
             selection = algorithm.select(population);
 
@@ -73,7 +75,7 @@ public class player36 implements ContestSubmission
 
             population = algorithm.kill(population, children);
 
-            population = algorithm.mutation(population);
+            population = algorithm.mutation(population, rate);
 
             population.evaluate();
             System.out.println(population.getIndividual(0).getFitness());

@@ -1,5 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by sebastien on 4-10-16.
@@ -7,16 +8,23 @@ import java.util.ArrayList;
 public class EA {
 
     private final SELECTION_TYPES selectionType;
+    private MUTATION_TYPE mutationType;
     private final double selectionPressure;
     private final int numParents;
+
     private final double pMutate = 0.5;
 
     public enum SELECTION_TYPES {
         UNIFORM, TOURNAMENT, ROULETTE, STOCHASTIC
     }
 
-    public EA(SELECTION_TYPES selectionType, double selectionPressure, int numParents){
+    public enum MUTATION_TYPE {
+        REINIT, GAUSSIAN_NOISE
+    }
+
+    public EA(SELECTION_TYPES selectionType, MUTATION_TYPE mutationType, double selectionPressure, int numParents){
         this.selectionType = selectionType;
+        this.mutationType = mutationType;
         this.selectionPressure = selectionPressure;
         this.numParents = numParents;
     }
@@ -62,13 +70,36 @@ public class EA {
         return population;
     }
 
-    public Population mutation(Population population){
-        for (int i = numParents; i < population.getPopSize(); i++)
+    public Population mutation(Population population, double rate)
+    {
+        switch (mutationType)
         {
-            if (Math.random() < pMutate)
-            {
-                population.getIndividual(i).initParams();
-            }
+            case REINIT:
+                for (int i = numParents; i < population.getPopSize(); i++)
+                {
+                    if (Math.random() < pMutate)
+                    {
+                        population.getIndividual(i).initParams();
+                    }
+                }
+                break;
+
+            case GAUSSIAN_NOISE:
+                Random r = new Random();
+                for (int i = numParents; i < population.getPopSize(); i++)
+                {
+                    if (Math.random() < pMutate)
+                    {
+                        Individual individual = population.getIndividual(i);
+                        double params[] = individual.getParameters();
+                        for (int j = 0; j < params.length; j++)
+                        {
+                            params[j] += rate * r.nextGaussian() / 3 * individual.range;
+                            if (params[j] > individual.paramLimits[1]) {params[j] = individual.paramLimits[1];}
+                            if (params[j] < individual.paramLimits[0]) {params[j] = individual.paramLimits[0];}
+                        }
+                    }
+                }
         }
         return population;
     }
