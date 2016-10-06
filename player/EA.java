@@ -8,8 +8,9 @@ import java.util.Random;
 public class EA {
 
     private final SELECTION_TYPES selectionType;
-    private MUTATION_TYPE mutationType;
+    private final MUTATION_TYPE mutationType;
     private final double selectionPressure;
+    private final KILL_TYPE killType;
     private final int numParents;
     private final double pMutate = 0.5;
 
@@ -27,10 +28,19 @@ public class EA {
         SINGLE_ARITHMETIC, SIMPLE_ARITHMETIC, WHOLE_ARITHMETIC
     }
 
-    public EA(SELECTION_TYPES selectionType, MUTATION_TYPE mutationType, RECOMBINATION_TYPES recombinationType, double selectionPressure, int numParents){
+    public enum KILL_TYPE {
+        RANDOM, WORST
+    }
+
+    public EA(SELECTION_TYPES selectionType,
+              MUTATION_TYPE mutationType,
+              RECOMBINATION_TYPES recombinationType,
+              KILL_TYPE killType,
+              double selectionPressure, int numParents){
 
         this.selectionType = selectionType;
         this.mutationType = mutationType;
+        this.killType = killType;
         this.selectionPressure = selectionPressure;
         this.numParents = numParents;
         this.recombinationType = recombinationType;
@@ -78,16 +88,28 @@ public class EA {
     }
 
     public Population kill(Population population, Population children){
-        ArrayList<Integer>killed = new ArrayList<>(children.getPopSize());
-        for(int i = 0; i < children.getPopSize();i++){
-            int toKill = -1;
-            while(toKill == -1 || killed.contains(toKill)){
-                toKill = (int )(Math.random() * population.getPopSize());
-            }
-            killed.add(toKill);
-            population.getIndividual(toKill).replace(children.getIndividual(i).getParameters());
+        switch(killType)
+        {
+            case RANDOM:
+                ArrayList<Integer>killed = new ArrayList<>(children.getPopSize());
+                for(int i = 0; i < children.getPopSize();i++){
+                    int toKill = -1;
+                    while(toKill == -1 || killed.contains(toKill)){
+                        toKill = (int )(Math.random() * population.getPopSize());
+                    }
+                    killed.add(toKill);
+                    population.getIndividual(toKill).replace(children.getIndividual(i).getParameters());
+                }
+                break;
+            case WORST:
+                ArrayList<Individual> childrenIndividuals = children.getPopulation();
+                ArrayList<Individual> populationIndividuals = population.getPopulation();
+                for (int i = 0; i < childrenIndividuals.size(); i++)
+                {
+                    populationIndividuals.set(populationIndividuals.size()-i-1, childrenIndividuals.get(i));
+                }
+                break;
         }
-
         return population;
     }
 

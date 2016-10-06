@@ -53,7 +53,16 @@ public class player36 implements ContestSubmission
             // Do sth else
         }
 
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, EA.MUTATION_TYPE.GAUSSIAN_NOISE, EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC, 1.5,numParents);
+        System.out.println("IsMultiModel: " + (isMultimodal ? "yes" : "no"));
+        System.out.println("hasStructure: " + (hasStructure ? "yes" : "no"));
+        System.out.println("isSeparable: " + (isSeparable ? "yes" : "no"));
+        System.out.println("maxIts: " + maxIterations);
+
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
+                EA.MUTATION_TYPE.REINIT,
+                EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
+                EA.KILL_TYPE.WORST,
+                1.5,numParents);
     }
 
 	public void run()
@@ -79,7 +88,7 @@ public class player36 implements ContestSubmission
             population = algorithm.mutation(population, rate);
 
             population.evaluate();
-            System.out.println(population.getIndividual(0).getFitness());
+            System.out.println(population.getIndividual(0));
 
             its++;
         }
