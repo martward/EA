@@ -8,6 +8,7 @@ import java.util.Properties;
 
 public class player36 implements ContestSubmission
 {
+
     private static final int populationSize = 50;
 
     Population population;
@@ -17,7 +18,7 @@ public class player36 implements ContestSubmission
     private int evaluations_limit_;
     private int maxIterations;
     double selectionPressure = 1;
-    int numParents = populationSize/10;
+    int numParents = (int) populationSize/2;
 	
 	public player36()
     {
@@ -45,7 +46,6 @@ public class player36 implements ContestSubmission
         boolean isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
         boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
-
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
         if(isMultimodal){
             // Do sth
@@ -53,12 +53,9 @@ public class player36 implements ContestSubmission
             // Do sth else
         }
 
-        System.out.println("IsMultiModel: " + (isMultimodal ? "yes" : "no"));
-        System.out.println("hasStructure: " + (hasStructure ? "yes" : "no"));
-        System.out.println("isSeparable: " + (isSeparable ? "yes" : "no"));
-        System.out.println("maxIts: " + maxIterations);
 
         algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
+
                 EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                 EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                 EA.KILL_TYPE.WORST,
@@ -74,8 +71,6 @@ public class player36 implements ContestSubmission
         Population children;
         double rate;
 
-
-        //maxIterations = 10;
         while(its < maxIterations) {
             rate = (double)its/(double)maxIterations;
 
@@ -88,6 +83,7 @@ public class player36 implements ContestSubmission
             population = algorithm.mutation(population, rate);
 
             population.evaluate();
+
             System.out.println(population.getIndividual(0));
 
             its++;

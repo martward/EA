@@ -25,7 +25,7 @@ public class EA {
     }
 
     public enum RECOMBINATION_TYPES {
-        SINGLE_ARITHMETIC, SIMPLE_ARITHMETIC, WHOLE_ARITHMETIC
+        SINGLE_ARITHMETIC, SIMPLE_ARITHMETIC, WHOLE_ARITHMETIC, NPOINTCROSSOVER, UNIFORMCROSSOVER
     }
 
     public enum KILL_TYPE {
@@ -56,6 +56,7 @@ public class EA {
         ArrayList<Individual> children = new ArrayList<>(parents.getPopSize());
         for(int i=0; i < parents.getPopSize(); i+=2)
         {
+
             double parent1Values[] = parents.getIndividual(i % parents.getPopSize()).getParameters();
             double parent2Values[] = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
             double child1Values[] = parent1Values.clone();
@@ -69,11 +70,16 @@ public class EA {
                 case SIMPLE_ARITHMETIC:
                     simpleArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
+                case UNIFORMCROSSOVER:
+                    uniformCrossover(parent1Values,parent2Values,child1Values,child2Values);
+                    break;
+                case NPOINTCROSSOVER:
+                    nPointCrossover(parent1Values,parent2Values,child1Values,child2Values);
+                    break;
                 case WHOLE_ARITHMETIC:
                     wholeArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
             }
-
             children.add(new Individual(child1Values));
             children.add(new Individual(child2Values));
         }
@@ -153,7 +159,8 @@ public class EA {
     {
         double alpha = Math.random();
         int i = (int) (Math.random() * parent1Values.length);
-        for(int j = i; j < parent1Values.length; j++){
+        for(int j = i; j < parent1Values.length; j++)
+        {
             child1Values[j] = alpha * parent2Values[j] + (1-alpha) * parent1Values[j];
             child2Values[j] = alpha * parent1Values[j] + (1-alpha) * parent2Values[j];
         }
@@ -162,9 +169,43 @@ public class EA {
     private void wholeArithmetic(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
     {
         double alpha = Math.random();
-        for(int j = 0; j < parent1Values.length; j++){
+        for(int j = 0; j < parent1Values.length; j++)
+        {
             child1Values[j] = alpha * parent2Values[j] + (1-alpha) * parent1Values[j];
             child2Values[j] = alpha * parent1Values[j] + (1-alpha) * parent2Values[j];
+        }
+    }
+
+    private void uniformCrossover(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
+    {
+        double alpha = Math.random();
+        for(int j = 0; j < parent1Values.length; j++) {
+            if (Math.random() < alpha)
+            {
+                child1Values[j] = parent1Values[j];
+                child2Values[j] = parent2Values[j];
+            } else
+            {
+                child1Values[j] = parent2Values[j];
+                child2Values[j] = parent1Values[j];
+            }
+        }
+    }
+
+    private void nPointCrossover(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
+    {
+        int i = (int) (Math.random() * parent1Values.length);
+        double alpha = Math.random();
+        for(int j = i; j < parent1Values.length; j++) {
+            if (Math.random() < alpha)
+            {
+                child1Values[j] = parent1Values[j];
+                child2Values[j] = parent2Values[j];
+            } else
+            {
+                child1Values[j] = parent2Values[j];
+                child2Values[j] = parent1Values[j];
+            }
         }
     }
 }
