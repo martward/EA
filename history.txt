@@ -1,0 +1,11 @@
+algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
+                EA.MUTATION_TYPE.GAUSSIAN_NOISE,
+                EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
+                EA.KILL_TYPE.WORST,
+                1.5,numParents);
+Cast to int method
+player36	1.7955567663525074
+player36	0.04776256359968868
+player36	2.321468319859871
+
+
