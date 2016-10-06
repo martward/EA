@@ -17,7 +17,7 @@ public class player36 implements ContestSubmission
     EA algorithm;
     private int evaluations_limit_;
     private int maxIterations;
-    double selectionPressure = 1;
+    double selectionPressure = 1.5;
     int numParents = (int) populationSize/2;
 	
 	public player36()
@@ -54,8 +54,7 @@ public class player36 implements ContestSubmission
         }
 
 
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM,
-
+        algorithm = new EA(EA.SELECTION_TYPES.LINEAR_RANK,
                 EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                 EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                 EA.KILL_TYPE.WORST,
@@ -70,7 +69,7 @@ public class player36 implements ContestSubmission
         Population selection;
         Population children;
         double rate;
-
+        //maxIterations = 10;
         while(its < maxIterations) {
             rate = (double)its/(double)maxIterations;
 
@@ -84,7 +83,7 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
 
-            System.out.println(population.getIndividual(0));
+            //System.out.println(population.getIndividual(0));
 
             its++;
         }

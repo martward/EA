@@ -42,8 +42,14 @@ public class Population {
     {
         for (Individual individual : population)
         {
-            individual.setFitness((double)evaluation.evaluate(individual.getParameters()));
+            double[] array = new double[individual.getParameters().length];
+            for(int i=0; i < array.length;i++)
+            {
+                array[i] = individual.getParameters()[i];
+            }
+            individual.setFitness((double)evaluation.evaluate(array));
         }
+
         Collections.sort(population, new Comparator<Individual>() {
             @Override
             public int compare(Individual t1, Individual individual) {

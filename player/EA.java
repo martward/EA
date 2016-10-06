@@ -17,7 +17,7 @@ public class EA {
     private final RECOMBINATION_TYPES recombinationType;
 
     public enum SELECTION_TYPES {
-        UNIFORM, TOURNAMENT, ROULETTE, STOCHASTIC
+        LINEAR_RANK, EXPONENTIAL_RANK, TOPN
     }
 
     public enum MUTATION_TYPE {
@@ -47,16 +47,34 @@ public class EA {
     }
 
     public Population select(Population currentPopulation){
-        Population selection = currentPopulation.getTopN(numParents);
-
+        double[] probs = new double[currentPopulation.getPopSize()];
+        Population selection;
+        int[] ranks = new int[currentPopulation.getPopSize()];
+        for(int i = 0; i < ranks.length; i++){
+            ranks[i] =  currentPopulation.getPopSize() - (i+1);
+        }
+        switch(selectionType)
+        {
+            case LINEAR_RANK:
+                probs = linearRank(ranks);
+                selection = selectPairs(currentPopulation,probs);
+                break;
+            case EXPONENTIAL_RANK:
+                probs = exponentialRank(ranks);
+                selection = selectPairs(currentPopulation,probs);
+                break;
+            default:
+                selection = currentPopulation.getTopN(numParents);
+                break;
+        }
         return selection;
     }
 
-    public Population recombine(Population parents){
+    public Population recombine(Population parents)
+    {
         ArrayList<Individual> children = new ArrayList<>(parents.getPopSize());
         for(int i=0; i < parents.getPopSize(); i+=2)
         {
-
             double parent1Values[] = parents.getIndividual(i % parents.getPopSize()).getParameters();
             double parent2Values[] = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
             double child1Values[] = parent1Values.clone();
@@ -86,7 +104,8 @@ public class EA {
         return new Population(children, parents.getEvaluation());
     }
 
-    public Population kill(Population population, Population children){
+    public Population kill(Population population, Population children)
+    {
         switch(killType)
         {
             case RANDOM:
@@ -208,4 +227,71 @@ public class EA {
             }
         }
     }
+
+    private double[] linearRank(int[] ranks)
+    {
+        double mu = mean(ranks);
+        double[] probabilities = new double[ranks.length];
+        for(int i=0; i < probabilities.length; i++)
+        {
+            probabilities[i] = ((2-selectionPressure)/ mu) + ((2*ranks[i]*(selectionPressure-1))/(mu*(mu-1)));
+        }
+        return probabilities;
+    }
+
+    private double[] exponentialRank(int[] ranks)
+    {
+        double mu = mean(ranks);
+        double[] probabilities = new double[ranks.length];
+        for(int i=0; i < probabilities.length; i++)
+        {
+            //probabilities[i] = ((2-selectionPressure)/ mu) + ((2*ranks[i]*(selectionPressure-1))/(mu*(mu-1)));
+            probabilities[i] =  (1-Math.exp(-ranks[i]))/(1.0/ranks.length);
+        }
+        return probabilities;
+    }
+
+    private double mean(int[] array)
+    {
+        double mean = 0.0;
+        for(int i=0;i < array.length;i++)
+        {
+            mean += array[i];
+        }
+        return (mean/ array.length);
+    }
+
+    private Population selectPairs(Population currentPopulation, double[] probabilities)
+        {
+            ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+            for(int i=0; i < 2*numParents; i+=2){
+                double rand = Math.random();
+                int j;
+                for(j=0; j < numParents; j++){
+                    if(rand > probabilities[j+1] || j == numParents-2)
+                    {
+                        parents.add(currentPopulation.getIndividual(j));
+                        break;
+                    }
+                }
+                int secondParent = -1;
+                while(secondParent == -1 || secondParent == j)
+                {
+                    rand = Math.random();
+                    for(int k = 0; k < numParents; k++)
+                    {
+                        if(rand > probabilities[k+1] || k == numParents-1)
+                        {
+                            secondParent = k;
+                            break;
+                        }
+                    }
+                }
+                parents.add( currentPopulation.getIndividual(secondParent));
+            }
+            return new Population(parents, currentPopulation.getEvaluation());
+        }
+
+
+
 }
