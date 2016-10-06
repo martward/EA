@@ -68,7 +68,7 @@ public class Population {
     }
 
     public Population getTopN(int n){
-        ArrayList<Individual> top = new ArrayList<>(population.subList(size-n-1, size-1));
+        ArrayList<Individual> top = new ArrayList<>(population.subList(0, n));
 
         return new Population(top, evaluation);
     }

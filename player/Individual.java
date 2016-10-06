@@ -25,7 +25,7 @@ public class Individual {
     {
         for (int i = 0; i < paramSize; i++)
         {
-            parameters[i] = Math.random() * paramLimits[1] - paramLimits[0] + paramLimits[0];
+            parameters[i] = Math.random() * (paramLimits[1] - paramLimits[0]) + paramLimits[0];
         }
     }
 
@@ -47,7 +47,11 @@ public class Individual {
 
     public String toString()
     {
-        return "Fitness: " + fitness + " (" + parameters + ")";
+        String params = "";
+        for(double param : parameters){
+            params+= param + ",";
+        }
+        return "Fitness: " + fitness + " (" + params + ")";
     }
 
     public void replace(double params[]){

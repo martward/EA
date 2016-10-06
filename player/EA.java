@@ -34,6 +34,9 @@ public class EA {
             double values2[];
             values1 = parents.getIndividual(i % parents.getPopSize()).getParameters();
             values2 = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
+            //System.out.println(parents.getIndividual(i % parents.getPopSize()));
+            //System.out.println(parents.getIndividual((i+1) % parents.getPopSize()));
+            //System.out.println("-----------");
             double childValues[] = new double[values1.length];
             for(int j = 0; j < values1.length; j++){
                 childValues[j] = (values1[j] + values2[j]) / 2;

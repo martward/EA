@@ -63,7 +63,7 @@ public class player36 implements ContestSubmission
         Population selection;
         Population childeren;
 
-        maxIterations = 10;
+        maxIterations = 100;
 
         while(its < maxIterations) {
             population.evaluate();
