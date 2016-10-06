@@ -61,7 +61,7 @@ public class player36 implements ContestSubmission
         population = new Population(populationSize, evaluation_);
         population.evaluate();
         Population selection;
-        Population childeren;
+        Population children;
 
         //maxIterations = 10;
 
@@ -69,9 +69,9 @@ public class player36 implements ContestSubmission
 
             selection = algorithm.select(population);
 
-            childeren = algorithm.recombine(selection);
+            children = algorithm.recombine(selection);
 
-            population = algorithm.kill(population, childeren);
+            population = algorithm.kill(population, children);
 
             population = algorithm.mutation(population);
 
