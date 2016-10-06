@@ -9,7 +9,11 @@ public class EA {
     private final SELECTION_TYPES selectionType;
     private final double selectionPressure;
     private final int numParents;
+<<<<<<< HEAD
     private final RECOMBINATION_TYPES recombinationType;
+=======
+    private final double pMutate = 0.5;
+>>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
 
     public enum SELECTION_TYPES {
         UNIFORM, TOURNAMENT, ROULETTE, STOCHASTIC
@@ -87,8 +91,14 @@ public class EA {
     }
 
     public Population mutation(Population population){
-
-        return null;
+        for (int i = numParents; i < population.getPopSize(); i++)
+        {
+            if (Math.random() < pMutate)
+            {
+                population.getIndividual(i).initParams();
+            }
+        }
+        return population;
     }
 
     private void singleArithmetic(double values1[], double values2[], double childValues1[], double childValues2[])

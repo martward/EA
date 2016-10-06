@@ -23,7 +23,6 @@ public class player36 implements ContestSubmission
     {
         algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10, EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC);
 		rnd_ = new Random();
-        //algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, selectionPressure, numParents);
 	}
 
 	public void setSeed(long seed)
@@ -41,7 +40,7 @@ public class player36 implements ContestSubmission
 		Properties props = evaluation.getProperties();
         // Get evaluation limit
         evaluations_limit_ = Integer.parseInt(props.getProperty("Evaluations"));
-        maxIterations = evaluations_limit_/populationSize;
+        maxIterations = evaluations_limit_/populationSize-1;
 		// Property keys depend on specific evaluation
 		// E.g. double param = Double.parseDouble(props.getProperty("property_name"));
         boolean isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
@@ -60,22 +59,33 @@ public class player36 implements ContestSubmission
     {
         int its = 0;
         population = new Population(populationSize, evaluation_);
+        population.evaluate();
         Population selection;
-        Population childeren;
+        Population children;
 
+<<<<<<< HEAD
         maxIterations = 1;
+=======
+        //maxIterations = 10;
+>>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
 
         while(its < maxIterations) {
-            population.evaluate();
 
             selection = algorithm.select(population);
 
+            children = algorithm.recombine(selection);
 
-            childeren = algorithm.recombine(selection);
+            population = algorithm.kill(population, children);
 
-            population = algorithm.kill(population, childeren);
+            population = algorithm.mutation(population);
 
+            population.evaluate();
+            System.out.println(population.getIndividual(0).getFitness());
+
+<<<<<<< HEAD
             //System.out.println(population);
+=======
+>>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
             its++;
         }
 	}
