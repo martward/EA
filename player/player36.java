@@ -21,7 +21,7 @@ public class player36 implements ContestSubmission
 	
 	public player36()
     {
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10);
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10, EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC);
 		rnd_ = new Random();
         //algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, selectionPressure, numParents);
 	}
@@ -63,7 +63,7 @@ public class player36 implements ContestSubmission
         Population selection;
         Population childeren;
 
-        maxIterations = 100;
+        maxIterations = 1;
 
         while(its < maxIterations) {
             population.evaluate();
@@ -75,7 +75,7 @@ public class player36 implements ContestSubmission
 
             population = algorithm.kill(population, childeren);
 
-            System.out.println(population);
+            //System.out.println(population);
             its++;
         }
 	}
