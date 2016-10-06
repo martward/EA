@@ -63,12 +63,8 @@ public class player36 implements ContestSubmission
         Population selection;
         Population children;
 
-<<<<<<< HEAD
-        maxIterations = 1;
-=======
-        //maxIterations = 10;
->>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
 
+        maxIterations = 10;
         while(its < maxIterations) {
 
             selection = algorithm.select(population);
@@ -81,11 +77,9 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
             System.out.println(population.getIndividual(0).getFitness());
-
-<<<<<<< HEAD
+            
             //System.out.println(population);
-=======
->>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
+
             its++;
         }
 	}

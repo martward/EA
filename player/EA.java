@@ -9,11 +9,8 @@ public class EA {
     private final SELECTION_TYPES selectionType;
     private final double selectionPressure;
     private final int numParents;
-<<<<<<< HEAD
     private final RECOMBINATION_TYPES recombinationType;
-=======
     private final double pMutate = 0.5;
->>>>>>> 37069d762889660cca0bf81bfa6366748f8320fe
 
     public enum SELECTION_TYPES {
         UNIFORM, TOURNAMENT, ROULETTE, STOCHASTIC
