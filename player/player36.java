@@ -21,7 +21,7 @@ public class player36 implements ContestSubmission
 	
 	public player36()
     {
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10, EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC);
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, 1.5,10, EA.RECOMBINATION_TYPES.UNIFORMCROSSOVER);
 		rnd_ = new Random();
 	}
 
@@ -46,7 +46,6 @@ public class player36 implements ContestSubmission
         boolean isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
         boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
-
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
         if(isMultimodal){
             // Do sth
@@ -64,7 +63,7 @@ public class player36 implements ContestSubmission
         Population children;
 
 
-        maxIterations = 10;
+        maxIterations = 50;
         while(its < maxIterations) {
 
             selection = algorithm.select(population);
@@ -77,7 +76,7 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
             System.out.println(population.getIndividual(0).getFitness());
-            
+
             //System.out.println(population);
 
             its++;

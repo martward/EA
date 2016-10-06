@@ -1,5 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by sebastien on 4-10-16.
@@ -17,7 +18,7 @@ public class EA {
     }
 
     public enum RECOMBINATION_TYPES {
-        SINGLE_ARITHMETIC, SIMPLE_ARITHMETIC, WHOLE_ARITHMETIC
+        SINGLE_ARITHMETIC, SIMPLE_ARITHMETIC, WHOLE_ARITHMETIC, NPOINTCROSSOVER, UNIFORMCROSSOVER
     }
 
     public EA(SELECTION_TYPES selectionType, double selectionPressure, int numParents, RECOMBINATION_TYPES recombinationType){
@@ -39,34 +40,31 @@ public class EA {
         {
             double parent1Values[];
             double parent2Values[];
-            double child1Values[];
-            double child2Values[];
             parent1Values = parents.getIndividual(i % parents.getPopSize()).getParameters();
             parent2Values = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
+            System.out.println(parent1Values);
+            System.out.println(parent2Values);
+            System.out.println("-------------");
+            double child1Values[] = parent1Values.clone();
+            double child2Values[] = parent2Values.clone();
             switch(recombinationType)
             {
                 case SINGLE_ARITHMETIC:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
                     singleArithmetic(parent1Values,parent2Values,child1Values,child2Values);
-                    System.out.println(child1Values);
-                    System.out.println(child2Values);
-                    System.out.println(parent1Values);
-                    System.out.println(parent2Values);
-                    System.out.println("-------------------");
                     break;
                 case SIMPLE_ARITHMETIC:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
                     simpleArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
+                case UNIFORMCROSSOVER:
+                    uniformCrossover(parent1Values,parent2Values,child1Values,child2Values);
+                    break;
+                case NPOINTCROSSOVER:
+                    nPointCrossover(parent1Values,parent2Values,child1Values,child2Values);
+                    break;
                 default:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
                     wholeArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
             }
-
             children.add(new Individual(child1Values));
             children.add(new Individual(child2Values));
         }
@@ -75,10 +73,15 @@ public class EA {
 
     public Population kill(Population population, Population children){
         ArrayList<Integer>killed = new ArrayList<>(children.getPopSize());
-        for(int i = 0; i < children.getPopSize();i++){
+        Random rand = new Random();
+        for(int i = 0; i < children.getPopSize();i++)
+        {
             int toKill = -1;
-            while(toKill == -1 || killed.contains(toKill)){
-                toKill = (int )(Math.random() * population.getPopSize());
+            while(toKill == -1 || killed.contains(toKill))
+            {
+                //toKill = (int )(Math.random() * population.getPopSize());
+                toKill = rand.nextInt(((population.getPopSize()-1) - children.getPopSize()) + 1) + children.getPopSize()-1;
+
             }
             killed.add(toKill);
             population.getIndividual(toKill).replace(children.getIndividual(i).getParameters());
@@ -101,6 +104,7 @@ public class EA {
     private void singleArithmetic(double values1[], double values2[], double childValues1[], double childValues2[])
     {
         double alpha = Math.random();
+        System.out.println(alpha);
         int i = (int) (Math.random() * values1.length);
         childValues1[i] = alpha * values2[i] + (1-alpha) * values1[i];
         childValues2[i] = alpha * values1[i] + (1-alpha) * values2[i];
@@ -111,7 +115,8 @@ public class EA {
     {
         double alpha = Math.random();
         int i = (int) (Math.random() * parent1Values.length);
-        for(int j = i; j < parent1Values.length; j++){
+        for(int j = i; j < parent1Values.length; j++)
+        {
             child1Values[j] = alpha * parent2Values[j] + (1-alpha) * parent1Values[j];
             child2Values[j] = alpha * parent1Values[j] + (1-alpha) * parent2Values[j];
         }
@@ -120,9 +125,43 @@ public class EA {
     private void wholeArithmetic(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
     {
         double alpha = Math.random();
-        for(int j = 0; j < parent1Values.length; j++){
+        for(int j = 0; j < parent1Values.length; j++)
+        {
             child1Values[j] = alpha * parent2Values[j] + (1-alpha) * parent1Values[j];
             child2Values[j] = alpha * parent1Values[j] + (1-alpha) * parent2Values[j];
+        }
+    }
+
+    private void uniformCrossover(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
+    {
+        double alpha = Math.random();
+        for(int j = 0; j < parent1Values.length; j++) {
+            if (Math.random() < alpha)
+            {
+                child1Values[j] = parent1Values[j];
+                child2Values[j] = parent2Values[j];
+            } else
+            {
+                child1Values[j] = parent2Values[j];
+                child2Values[j] = parent1Values[j];
+            }
+        }
+    }
+
+    private void nPointCrossover(double parent1Values[], double parent2Values[], double child1Values[], double child2Values[])
+    {
+        int i = (int) (Math.random() * parent1Values.length);
+        double alpha = Math.random();
+        for(int j = i; j < parent1Values.length; j++) {
+            if (Math.random() < alpha)
+            {
+                child1Values[j] = parent1Values[j];
+                child2Values[j] = parent2Values[j];
+            } else
+            {
+                child1Values[j] = parent2Values[j];
+                child2Values[j] = parent1Values[j];
+            }
         }
     }
 }
