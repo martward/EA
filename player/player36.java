@@ -21,7 +21,8 @@ public class player36 implements ContestSubmission
 	
 	public player36()
     {
-        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, EA.MUTATION_TYPE.GAUSSIAN_NOISE, 1.5,10);
+        algorithm = new EA(EA.SELECTION_TYPES.UNIFORM, EA.MUTATION_TYPE.GAUSSIAN_NOISE, EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC, 1.5,10);
+
 		rnd_ = new Random();
 	}
 
@@ -64,8 +65,8 @@ public class player36 implements ContestSubmission
         Population children;
         double rate;
 
-        //maxIterations = 10;
 
+        maxIterations = 10;
         while(its < maxIterations) {
             rate = its/maxIterations;
 
@@ -79,7 +80,7 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
             System.out.println(population.getIndividual(0).getFitness());
-
+            
             its++;
         }
 	}
