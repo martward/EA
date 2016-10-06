@@ -6,7 +6,7 @@
 public class Individual {
 
     int paramSize = 10;
-    int paramLimits[] = {-50000, 50000};
+    int paramLimits[] = {-5, 5};
     int range = paramLimits[1] - paramLimits[0];
 
     private double fitness = 0;
