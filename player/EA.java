@@ -56,27 +56,20 @@ public class EA {
         ArrayList<Individual> children = new ArrayList<>(parents.getPopSize());
         for(int i=0; i < parents.getPopSize(); i+=2)
         {
-            double parent1Values[];
-            double parent2Values[];
-            double child1Values[];
-            double child2Values[];
-            parent1Values = parents.getIndividual(i % parents.getPopSize()).getParameters();
-            parent2Values = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
+            double parent1Values[] = parents.getIndividual(i % parents.getPopSize()).getParameters();
+            double parent2Values[] = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
+            double child1Values[] = parent1Values.clone();
+            double child2Values[] = parent2Values.clone();
+
             switch(recombinationType)
             {
                 case SINGLE_ARITHMETIC:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
                     singleArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
                 case SIMPLE_ARITHMETIC:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
                     simpleArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
-                default:
-                    child1Values = parent1Values.clone();
-                    child2Values = parent2Values.clone();
+                case WHOLE_ARITHMETIC:
                     wholeArithmetic(parent1Values,parent2Values,child1Values,child2Values);
                     break;
             }
