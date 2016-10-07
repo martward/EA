@@ -8,6 +8,7 @@ public class Individual {
     int paramSize = 10;
     int paramLimits[] = {-5, 5};
     int range = paramLimits[1] - paramLimits[0];
+    double pMutate;
 
     private double fitness = 0;
 

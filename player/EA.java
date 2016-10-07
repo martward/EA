@@ -12,7 +12,8 @@ public class EA {
     private final double selectionPressure;
     private final KILL_TYPE killType;
     private final int numParents;
-    private final double pMutate = 0.5;
+    private double pMutate;
+    private int numChildren;
 
     private final RECOMBINATION_TYPES recombinationType;
 
@@ -36,14 +37,17 @@ public class EA {
               MUTATION_TYPE mutationType,
               RECOMBINATION_TYPES recombinationType,
               KILL_TYPE killType,
-              double selectionPressure, int numParents){
+              double selectionPressure, int numParents,
+              int numChildren, double pMutate){
 
         this.selectionType = selectionType;
         this.mutationType = mutationType;
         this.killType = killType;
         this.selectionPressure = selectionPressure;
         this.numParents = numParents;
+        this.numChildren = numChildren;
         this.recombinationType = recombinationType;
+        this.pMutate = pMutate;
     }
 
     public Population select(Population currentPopulation){
@@ -72,8 +76,8 @@ public class EA {
 
     public Population recombine(Population parents)
     {
-        ArrayList<Individual> children = new ArrayList<>(parents.getPopSize());
-        for(int i=0; i < parents.getPopSize(); i+=2)
+        ArrayList<Individual> children = new ArrayList<>(numChildren);
+        for(int i=0; i < numChildren; i+=2)
         {
             double parent1Values[] = parents.getIndividual(i % parents.getPopSize()).getParameters();
             double parent2Values[] = parents.getIndividual((i+1) % parents.getPopSize()).getParameters();
@@ -292,6 +296,14 @@ public class EA {
             return new Population(parents, currentPopulation.getEvaluation());
         }
 
+    public double getMutateP()
+    {
+        return pMutate;
+    }
 
+    public void setMutate(double p)
+    {
+        pMutate = p;
+    }
 
 }

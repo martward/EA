@@ -1,0 +1,16 @@
+Sphere:
+	Multimodal 	False
+	hasStructure	True
+	isSeparable	True
+
+Rastrigin:
+	Multimodal 	True
+	hasStructure	True
+	isSeparable	False
+
+FP:
+	Multimodal 	True
+	hasStructure	False
+	isSeparable	False
+
+

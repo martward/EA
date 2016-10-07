@@ -9,7 +9,7 @@ import java.util.Properties;
 public class player36 implements ContestSubmission
 {
 
-    private static final int populationSize = 50;
+    private static int populationSize = 50;
 
     Population population;
     Random rnd_;
@@ -18,7 +18,10 @@ public class player36 implements ContestSubmission
     private int evaluations_limit_;
     private int maxIterations;
     double selectionPressure = 1.5;
-    int numParents = (int) populationSize/2;
+    int numParents;
+    int numChildren;
+    double pMutate;
+    boolean isMultimodal;
 	
 	public player36()
     {
@@ -40,29 +43,78 @@ public class player36 implements ContestSubmission
 		Properties props = evaluation.getProperties();
         // Get evaluation limit
         evaluations_limit_ = Integer.parseInt(props.getProperty("Evaluations"));
-        maxIterations = evaluations_limit_/populationSize-1;
 		// Property keys depend on specific evaluation
 		// E.g. double param = Double.parseDouble(props.getProperty("property_name"));
-        boolean isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
+        isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
         boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
-        if(isMultimodal){
-            // Do sth
-        }else{
-            // Do sth else
+        if(isMultimodal)
+        {
+            if(hasStructure)
+            {
+                if (isSeparable)
+                {
+                    // Multimodal, structure and separable
+                    populationSize = 50;
+                }else
+                {
+                    // Multimodal, structure and not separable
+                    populationSize = 50;
+                }
+            }else
+            {
+                if (isSeparable)
+                {
+                    // Multimodal, no structure and separable
+                    populationSize = 50;
+                }else
+                {
+                    // Multimodal, no structure and not separable
+                    populationSize = 50;
+                }
+            }
+        }else {
+            if(hasStructure)
+            {
+                if (isSeparable)
+                {
+                    // Not multimodal, structure and separable
+                    populationSize = 50;
+                }else
+                {
+                    // Not multimodal, structure and not separable
+                    populationSize = 50;
+                }
+            }else
+            {
+                if (isSeparable)
+                {
+                    // Not multimodal, no structure and separable
+                    populationSize = 50;
+                }else
+                {
+                    // Not multimodal, no structure and not separable
+                    populationSize = 10;
+                }
+            }
         }
-
+        pMutate = 0.4;
+        numParents = (int) populationSize/2;
+        int numChildren = numParents;
+        maxIterations = evaluations_limit_/populationSize-1;
 
         algorithm = new EA(EA.SELECTION_TYPES.LINEAR_RANK,
                 EA.MUTATION_TYPE.GAUSSIAN_NOISE,
-                EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
+                EA.RECOMBINATION_TYPES.WHOLE_ARITHMETIC,
                 EA.KILL_TYPE.WORST,
-                1.5,numParents);
+                1.3,numParents, numChildren,pMutate
+        );
     }
 
 	public void run()
     {
+        System.out.println(populationSize);
         int its = 0;
         population = new Population(populationSize, evaluation_);
         population.evaluate();
@@ -70,7 +122,7 @@ public class player36 implements ContestSubmission
         Population children;
         double rate;
         //maxIterations = 10;
-        while(its < maxIterations) {
+        while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
             rate = (double)its/(double)maxIterations;
 
             selection = algorithm.select(population);
@@ -85,7 +137,13 @@ public class player36 implements ContestSubmission
 
             //System.out.println(population.getIndividual(0));
 
+            if(its % 100 == 0 && !isMultimodal) {
+                {
+                    algorithm.setMutate(algorithm.getMutateP() / 2);
+                }
+            }
             its++;
         }
+        System.out.println(its);
 	}
 }
