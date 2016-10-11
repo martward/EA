@@ -52,7 +52,7 @@ public class player36 implements ContestSubmission
         hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 
-        System.out.println("Multimodel: " + (isMultimodal ? "yes" : "no"));
+        System.out.println("Multi model: " + (isMultimodal ? "yes" : "no"));
         System.out.println("Structure: " + (hasStructure ? "yes" : "no"));
         System.out.println("Separable: " + (isSeparable ? "yes" : "no"));
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
@@ -90,16 +90,16 @@ public class player36 implements ContestSubmission
         }
         else
         {
-            populationSize = 50;
-            pMutate = 0.4;
-            numParents = (int) populationSize/2;
+            populationSize = 100;
+            pMutate = 0.2;
+            numParents = (int) populationSize/4;
             numChildren = numParents;
             maxIterations = evaluations_limit_/populationSize-1;
             singleParamMode = false;
 
             algorithm = new EA(EA.SELECTION_TYPES.TOPN,
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
-                    EA.RECOMBINATION_TYPES.WHOLE_ARITHMETIC,
+                    EA.RECOMBINATION_TYPES.NPOINTCROSSOVER,
                     EA.KILL_TYPE.WORST,
                     1.3,numParents, numChildren,pMutate, singleParamMode);
         }
@@ -118,11 +118,11 @@ public class player36 implements ContestSubmission
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
             {
-                rate = Math.pow(0.001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
+                rate = Math.pow(0.0001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
             }
             else
             {
-                rate = Math.pow(0.001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.0001, (double)its/(double)maxIterations);
             }
             //System.out.println("Rate: " + rate);
             //System.out.println("pop size: " + populationSize);
