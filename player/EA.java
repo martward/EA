@@ -1,5 +1,7 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -108,6 +110,7 @@ public class EA {
         return new Population(children, parents.getEvaluation());
     }
 
+    /*
     public Population kill(Population population, Population children)
     {
         switch(killType)
@@ -133,6 +136,27 @@ public class EA {
                 break;
         }
         return population;
+    }
+    */
+
+    public Population kill(Population population, Population children, int popSize)
+    {
+        ArrayList<Individual> muPlusLambda = population.getPopulation();
+        muPlusLambda.addAll(children.getPopulation());
+        //System.out.println(muPlusLambda.size());
+        Population childrenAndParents = new Population(muPlusLambda, children.getEvaluation());
+        Collections.sort(childrenAndParents.getPopulation(), new Comparator<Individual>() {
+            @Override
+            public int compare(Individual t1, Individual individual) {
+                return Double.compare(individual.getFitness(), t1.getFitness());
+            }
+        });
+        //System.out.println(childrenAndParents.toString());
+        ArrayList<Individual> top = new ArrayList<>(childrenAndParents.getPopulation().subList(0, popSize));
+        Population newPop = new Population(top, population.getEvaluation());
+        //System.out.println(newPop.toString());
+        return newPop;
+
     }
 
     public Population mutation(Population population, double rate)

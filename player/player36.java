@@ -49,10 +49,10 @@ public class player36 implements ContestSubmission
         boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
-        populationSize = 50;
-        pMutate = 0.4;
+        populationSize = 76;
+        pMutate = 0.25;
         numParents = (int) populationSize/2;
-        int numChildren = numParents;
+        int numChildren = 3* numParents;
         maxIterations = evaluations_limit_/populationSize-1;
 
         algorithm = new EA(EA.SELECTION_TYPES.LINEAR_RANK,
@@ -72,28 +72,22 @@ public class player36 implements ContestSubmission
         Population selection;
         Population children;
         double rate;
-        //maxIterations = 10;
         while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
             rate = 1. - (double)its/(double)maxIterations;
+
 
             selection = algorithm.select(population);
 
             children = algorithm.recombine(selection);
 
-            population = algorithm.kill(population, children);
+            population = algorithm.kill(population, children, populationSize);
 
             population = algorithm.mutation(population, rate);
 
             population.evaluate();
 
             //System.out.println(population.getIndividual(0));
-            /*
-            if(its % 100 == 0 && !isMultimodal) {
-                {
-                    algorithm.setMutate(algorithm.getMutateP() / 2);
-                }
-            }
-            */
+
             its++;
         }
         System.out.println(its);
