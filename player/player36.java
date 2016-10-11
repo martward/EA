@@ -49,56 +49,7 @@ public class player36 implements ContestSubmission
         boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
-        if(isMultimodal)
-        {
-            if(hasStructure)
-            {
-                if (isSeparable)
-                {
-                    // Multimodal, structure and separable
-                    populationSize = 50;
-                }else
-                {
-                    // Multimodal, structure and not separable
-                    populationSize = 50;
-                }
-            }else
-            {
-                if (isSeparable)
-                {
-                    // Multimodal, no structure and separable
-                    populationSize = 50;
-                }else
-                {
-                    // Multimodal, no structure and not separable
-                    populationSize = 50;
-                }
-            }
-        }else {
-            if(hasStructure)
-            {
-                if (isSeparable)
-                {
-                    // Not multimodal, structure and separable
-                    populationSize = 50;
-                }else
-                {
-                    // Not multimodal, structure and not separable
-                    populationSize = 50;
-                }
-            }else
-            {
-                if (isSeparable)
-                {
-                    // Not multimodal, no structure and separable
-                    populationSize = 50;
-                }else
-                {
-                    // Not multimodal, no structure and not separable
-                    populationSize = 10;
-                }
-            }
-        }
+        populationSize = 50;
         pMutate = 0.4;
         numParents = (int) populationSize/2;
         int numChildren = numParents;
@@ -123,7 +74,7 @@ public class player36 implements ContestSubmission
         double rate;
         //maxIterations = 10;
         while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
-            rate = (double)its/(double)maxIterations;
+            rate = 1. - (double)its/(double)maxIterations;
 
             selection = algorithm.select(population);
 
@@ -136,12 +87,13 @@ public class player36 implements ContestSubmission
             population.evaluate();
 
             //System.out.println(population.getIndividual(0));
-
+            /*
             if(its % 100 == 0 && !isMultimodal) {
                 {
                     algorithm.setMutate(algorithm.getMutateP() / 2);
                 }
             }
+            */
             its++;
         }
         System.out.println(its);

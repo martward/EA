@@ -58,6 +58,10 @@ public class Population {
         });
     }
 
+    public double evaluateIndividual(double[] array){
+        return (double)evaluation.evaluate(array);
+    }
+
     public ContestEvaluation getEvaluation()
     {
         return evaluation;

@@ -266,35 +266,58 @@ public class EA {
     }
 
     private Population selectPairs(Population currentPopulation, double[] probabilities)
-        {
-            ArrayList<Individual> parents = new ArrayList<>(2*numParents);
-            for(int i=0; i < 2*numParents; i+=2){
-                double rand = Math.random();
-                int j;
-                for(j=0; j < numParents; j++){
-                    if(rand > probabilities[j+1] || j == numParents-2)
-                    {
-                        parents.add(currentPopulation.getIndividual(j));
-                        break;
-                    }
-                }
-                int secondParent = -1;
-                while(secondParent == -1 || secondParent == j)
+    {
+        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+        for(int i=0; i < 2*numChildren; i+=2){
+            double rand = Math.random();
+            int j;
+            for(j=0; j < numParents; j++){
+                if(rand > probabilities[j+1] || j == numParents-2)
                 {
-                    rand = Math.random();
-                    for(int k = 0; k < numParents; k++)
+                    parents.add(currentPopulation.getIndividual(j));
+                    break;
+                }
+            }
+            int secondParent = -1;
+            while(secondParent == -1 || secondParent == j  )
+            {
+                rand = Math.random();
+                for(int k = 0; k < numParents; k++)
+                {
+                    if(k != j)
                     {
-                        if(rand > probabilities[k+1] || k == numParents-1)
-                        {
+                        //System.out.println(calculateDistance(currentPopulation.getIndividual(j), currentPopulation.getIndividual(k)));
+                        if (rand > probabilities[k + 1] || k == numParents - 1) {
                             secondParent = k;
                             break;
                         }
                     }
                 }
-                parents.add( currentPopulation.getIndividual(secondParent));
             }
-            return new Population(parents, currentPopulation.getEvaluation());
+            parents.add( currentPopulation.getIndividual(secondParent));
         }
+        return new Population(parents, currentPopulation.getEvaluation());
+    }
+/*
+    public Population diffusionSelection(Population currentPopulation, double[] probabilities)
+    {
+        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+        for(int i=0; i < 2*numParents; i+=2){
+            double rand = Math.random();
+            int j;
+            for(j=0; j < numParents; j++){
+                if(rand > probabilities[j+1] || j == numParents-2)
+                {
+                    parents.add(currentPopulation.getIndividual(j));
+                    break;
+                }
+            }
+
+
+
+    }
+*/
+
 
     public double getMutateP()
     {
@@ -306,4 +329,15 @@ public class EA {
         pMutate = p;
     }
 
+    public double calculateDistance(Individual individual1, Individual individual2)
+    {
+        double distance = 0.0;
+        double[] parameters1 = individual1.getParameters();
+        double[] parameters2 = individual2.getParameters();
+        for(int i = 0; i < parameters1.length; i++)
+        {
+            distance += Math.pow((parameters1[i] - parameters2[i]), 2);
+        }
+        return Math.sqrt(distance);
+    }
 }
