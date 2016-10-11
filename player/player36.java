@@ -96,7 +96,8 @@ public class player36 implements ContestSubmission
         double rate;
         //maxIterations = 1;
         while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
-            rate = 1. - (double)its/(double)maxIterations;
+            //rate = 1. - (double)its/(double)maxIterations;
+            rate = Math.pow(0.01, (double)its/(double)maxIterations);
             //System.out.println("Rate: " + rate);
             //System.out.println("pop size: " + populationSize);
 
