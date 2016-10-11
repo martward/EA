@@ -19,9 +19,11 @@ public class player36 implements ContestSubmission
     private int maxIterations;
     double selectionPressure = 1.5;
     int numParents;
-    int numChildren;
     double pMutate;
     boolean isMultimodal;
+    boolean hasStructure;
+    boolean isSeparable;
+    int numChildren;
 	
 	public player36()
     {
@@ -46,43 +48,80 @@ public class player36 implements ContestSubmission
 		// Property keys depend on specific evaluation
 		// E.g. double param = Double.parseDouble(props.getProperty("property_name"));
         isMultimodal = Boolean.parseBoolean(props.getProperty("Multimodal"));
-        boolean hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
-        boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
-		// Do sth with property values, e.g. specify relevant settings of your algorithm
-        populationSize = 76;
-        pMutate = 0.25;
-        numParents = (int) populationSize/2;
-        int numChildren = 3* numParents;
-        maxIterations = evaluations_limit_/populationSize-1;
+        hasStructure = Boolean.parseBoolean(props.getProperty("Regular"));
+        isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 
-        algorithm = new EA(EA.SELECTION_TYPES.LINEAR_RANK,
-                EA.MUTATION_TYPE.GAUSSIAN_NOISE,
-                EA.RECOMBINATION_TYPES.WHOLE_ARITHMETIC,
-                EA.KILL_TYPE.WORST,
-                1.3,numParents, numChildren,pMutate
-        );
+        System.out.println("Multimodel: " + (isMultimodal ? "yes" : "no"));
+        System.out.println("Structure: " + (hasStructure ? "yes" : "no"));
+        System.out.println("Separable: " + (isSeparable ? "yes" : "no"));
+		// Do sth with property values, e.g. specify relevant settings of your algorithm
+
+        if (!isMultimodal)
+        {
+            System.out.println("not multimodel mode");
+            populationSize = 50;
+            numParents = 1;
+            numChildren = populationSize - numParents;
+            pMutate = 1.0;
+            maxIterations = evaluations_limit_/populationSize-1;
+
+            algorithm = new EA(EA.SELECTION_TYPES.TOPN,
+                    EA.MUTATION_TYPE.GAUSSIAN_NOISE,
+                    EA.RECOMBINATION_TYPES.NPOINTCROSSOVER,
+                    EA.KILL_TYPE.WORST,
+                    1.3,numParents, numChildren,pMutate);
+        }
+        else
+        {
+            populationSize = 100;
+            pMutate = 0.6;
+            numParents = (int) populationSize/2;
+            numChildren = numParents;
+            maxIterations = evaluations_limit_/populationSize-1;
+
+            algorithm = new EA(EA.SELECTION_TYPES.RANDTOPN,
+                    EA.MUTATION_TYPE.GAUSSIAN_NOISE,
+                    EA.RECOMBINATION_TYPES.WHOLE_ARITHMETIC,
+                    EA.KILL_TYPE.WORST,
+                    1.7,numParents, numChildren,pMutate);
+        }
+
     }
 
 	public void run()
     {
-        System.out.println(populationSize);
         int its = 0;
         population = new Population(populationSize, evaluation_);
         population.evaluate();
         Population selection;
         Population children;
         double rate;
+        //maxIterations = 2;
         while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
-            rate = 1. - (double)its/(double)maxIterations;
+            //rate = 1. - (double)its/(double)maxIterations;
+            rate = Math.pow(0.01, (double)its/(double)maxIterations);
+            //System.out.println("Rate: " + rate);
+            //System.out.println("pop size: " + populationSize);
 
 
             selection = algorithm.select(population);
+            //System.out.println("Selection: ");
+            //System.out.println(selection + "\n\n");
+
 
             children = algorithm.recombine(selection);
+            //System.out.println("Children: ");
+            //System.out.println(children + "\n\n");
 
-            population = algorithm.kill(population, children, populationSize);
+
+            population = algorithm.kill(population, children);
+
+            //System.out.println("After kill: ");
+            //System.out.println(population + "\n\n");
 
             population = algorithm.mutation(population, rate);
+            //System.out.println("New: ");
+            //System.out.println(population + "\n\n");
 
             population.evaluate();
 
@@ -90,6 +129,7 @@ public class player36 implements ContestSubmission
 
             its++;
         }
-        System.out.println(its);
-	}
+        System.out.println("Number of iterations ran: " + its);
+	    //System.out.println(population.toString());
+    }
 }

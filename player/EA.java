@@ -20,7 +20,7 @@ public class EA {
     private final RECOMBINATION_TYPES recombinationType;
 
     public enum SELECTION_TYPES {
-        LINEAR_RANK, EXPONENTIAL_RANK, TOPN
+        LINEAR_RANK, EXPONENTIAL_RANK, TOPN, RANDTOPN
     }
 
     public enum MUTATION_TYPE {
@@ -63,11 +63,16 @@ public class EA {
         {
             case LINEAR_RANK:
                 probs = linearRank(ranks);
+                //selection = diffusionSelection(currentPopulation,probs);
                 selection = selectPairs(currentPopulation,probs);
                 break;
             case EXPONENTIAL_RANK:
                 probs = exponentialRank(ranks);
+                //selection = diffusionSelection(currentPopulation,probs);
                 selection = selectPairs(currentPopulation,probs);
+                break;
+            case RANDTOPN:
+                selection = randTopN(currentPopulation);
                 break;
             default:
                 selection = currentPopulation.getTopN(numParents);
@@ -110,7 +115,7 @@ public class EA {
         return new Population(children, parents.getEvaluation());
     }
 
-    /*
+
     public Population kill(Population population, Population children)
     {
         switch(killType)
@@ -137,27 +142,8 @@ public class EA {
         }
         return population;
     }
-    */
 
-    public Population kill(Population population, Population children, int popSize)
-    {
-        ArrayList<Individual> muPlusLambda = population.getPopulation();
-        muPlusLambda.addAll(children.getPopulation());
-        //System.out.println(muPlusLambda.size());
-        Population childrenAndParents = new Population(muPlusLambda, children.getEvaluation());
-        Collections.sort(childrenAndParents.getPopulation(), new Comparator<Individual>() {
-            @Override
-            public int compare(Individual t1, Individual individual) {
-                return Double.compare(individual.getFitness(), t1.getFitness());
-            }
-        });
-        //System.out.println(childrenAndParents.toString());
-        ArrayList<Individual> top = new ArrayList<>(childrenAndParents.getPopulation().subList(0, popSize));
-        Population newPop = new Population(top, population.getEvaluation());
-        //System.out.println(newPop.toString());
-        return newPop;
 
-    }
 
     public Population mutation(Population population, double rate)
     {
@@ -322,25 +308,72 @@ public class EA {
         }
         return new Population(parents, currentPopulation.getEvaluation());
     }
-/*
+
+    private Population randTopN(Population currentPopulation)
+    {
+        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+        for(int i = 0; i < 2*numChildren; i++)
+        {
+            ArrayList<Individual> subPop = new ArrayList<Individual>();
+            for(int j = 0; j < 10; j++)
+            {
+                subPop.add(currentPopulation.getIndividual((int) Math.random()*numParents));
+            }
+            double curScore = 0;
+            int curBest = 0;
+            for(int k = 0; k < 10; k++)
+            {
+                if(subPop.get(k).getFitness() > curScore)
+                {
+                    curScore = subPop.get(k).getFitness();
+                    curBest = k;
+                }
+            }
+            parents.add(currentPopulation.getIndividual(curBest));
+            int secondParent = -1;
+            while(secondParent == -1 || secondParent == curBest)
+            {
+                subPop = new ArrayList<Individual>();
+                for(int j = 0; j < 10; j++)
+                {
+                    subPop.add(currentPopulation.getIndividual((int) Math.random()*numParents));
+                }
+                curScore = 0;
+                for(int k = 0; k < 10; k++)
+                {
+                    if(subPop.get(k).getFitness() > curScore)
+                    {
+                        curScore = subPop.get(k).getFitness();
+                        secondParent = k;
+                    }
+                }
+            }
+            parents.add(currentPopulation.getIndividual(secondParent));
+        }
+        return new Population(parents, currentPopulation.getEvaluation());
+    }
+
     public Population diffusionSelection(Population currentPopulation, double[] probabilities)
     {
         ArrayList<Individual> parents = new ArrayList<>(2*numParents);
-        for(int i=0; i < 2*numParents; i+=2){
+        for(int i=0; i < 2*numChildren; i+=2) {
             double rand = Math.random();
             int j;
-            for(j=0; j < numParents; j++){
-                if(rand > probabilities[j+1] || j == numParents-2)
-                {
+            for (j = 0; j < numParents; j++) {
+                if (rand > probabilities[j + 1] || j == numParents - 2) {
                     parents.add(currentPopulation.getIndividual(j));
                     break;
                 }
             }
-
-
+            int secondParent = -1;
+            while (secondParent == -1 || secondParent == j) {
+                secondParent = calculateDistance(j, currentPopulation.getPopulation());
+            }
+            parents.add(currentPopulation.getIndividual(secondParent));
+        }
+    return new Population(parents, currentPopulation.getEvaluation());
 
     }
-*/
 
 
     public double getMutateP()
@@ -353,15 +386,28 @@ public class EA {
         pMutate = p;
     }
 
-    public double calculateDistance(Individual individual1, Individual individual2)
-    {
-        double distance = 0.0;
-        double[] parameters1 = individual1.getParameters();
-        double[] parameters2 = individual2.getParameters();
-        for(int i = 0; i < parameters1.length; i++)
-        {
-            distance += Math.pow((parameters1[i] - parameters2[i]), 2);
+    public int calculateDistance(int j, ArrayList<Individual> pop) {
+        int curClosest = -1;
+        double curDist = -1;
+        //System.out.println(pop.size());
+        for (int i = 0; i < pop.size(); i++) {
+            if (i != j) {
+                double distance = 0.0;
+                double[] parameters1 = pop.get(j).getParameters();
+                double[] parameters2 = pop.get(j).getParameters();
+                for (int k = 0; k < parameters1.length; k++) {
+                    distance += Math.pow((parameters1[k] - parameters2[k]), 2);
+                }
+                distance = Math.sqrt(distance);
+                if (distance > curDist) {
+                    curDist = distance;
+                    curClosest = i;
+                }
+            }
+
+
         }
-        return Math.sqrt(distance);
+        return curClosest;
     }
+
 }
