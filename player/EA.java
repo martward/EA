@@ -16,6 +16,7 @@ public class EA {
     private final int numParents;
     private double pMutate;
     private int numChildren;
+    private boolean singleParamMode = false;
 
     private final RECOMBINATION_TYPES recombinationType;
 
@@ -40,7 +41,7 @@ public class EA {
               RECOMBINATION_TYPES recombinationType,
               KILL_TYPE killType,
               double selectionPressure, int numParents,
-              int numChildren, double pMutate){
+              int numChildren, double pMutate, boolean singleParamMode){
 
         this.selectionType = selectionType;
         this.mutationType = mutationType;
@@ -50,6 +51,7 @@ public class EA {
         this.numChildren = numChildren;
         this.recombinationType = recombinationType;
         this.pMutate = pMutate;
+        this.singleParamMode = singleParamMode;
     }
 
     public Population select(Population currentPopulation){
@@ -147,6 +149,11 @@ public class EA {
 
     public Population mutation(Population population, double rate)
     {
+        return mutation( population, rate, 0);
+    }
+
+    public Population mutation(Population population, double rate, double progress)
+    {
         switch (mutationType)
         {
             case REINIT:
@@ -167,12 +174,23 @@ public class EA {
                     {
                         Individual individual = population.getIndividual(i);
                         double params[] = individual.getParameters();
-                        for (int j = 0; j < params.length; j++)
+                        if (singleParamMode)
                         {
+                            int j = (int)Math.round(individual.paramSize * progress);
                             params[j] += rate * r.nextGaussian() / 3 * individual.range;
                             if (params[j] > individual.paramLimits[1]) {params[j] = individual.paramLimits[1];}
                             if (params[j] < individual.paramLimits[0]) {params[j] = individual.paramLimits[0];}
                         }
+                        else
+                        {
+                            for (int j = 0; j < params.length; j++)
+                            {
+                                params[j] += rate * r.nextGaussian() / 3 * individual.range;
+                                if (params[j] > individual.paramLimits[1]) {params[j] = individual.paramLimits[1];}
+                                if (params[j] < individual.paramLimits[0]) {params[j] = individual.paramLimits[0];}
+                            }
+                        }
+
                     }
                 }
         }
