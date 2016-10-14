@@ -21,7 +21,7 @@ public class EA {
     private final RECOMBINATION_TYPES recombinationType;
 
     public enum SELECTION_TYPES {
-        LINEAR_RANK, EXPONENTIAL_RANK, TOPN, RANDTOPN
+        LINEAR_RANK, EXPONENTIAL_RANK, TOPN, RANDTOPN, DISTANCE
     }
 
     public enum MUTATION_TYPE {
@@ -65,7 +65,7 @@ public class EA {
         {
             case LINEAR_RANK:
                 probs = linearRank(ranks);
-                //selection = diffusionSelection(currentPopulation,probs);
+                //selection = diffusionSelectionStochastic(currentPopulation,probs);
                 selection = selectPairs(currentPopulation,probs);
                 break;
             case EXPONENTIAL_RANK:
@@ -75,6 +75,12 @@ public class EA {
                 break;
             case RANDTOPN:
                 selection = randTopN(currentPopulation);
+                break;
+            case DISTANCE:
+                probs = linearRank(ranks);
+                //System.out.println("yaaay");
+                selection = diffusionSelection(currentPopulation, probs);
+                //selection = diffusionSelectionStochastic(currentPopulation,probs);
                 break;
             default:
                 selection = currentPopulation.getTopN(numParents);
@@ -108,7 +114,12 @@ public class EA {
                     nPointCrossover(parent1Values,parent2Values,child1Values,child2Values);
                     break;
                 case WHOLE_ARITHMETIC:
+                    //System.out.println(child1Values[0]);
+                    //System.out.println(child2Values[0]);
                     wholeArithmetic(parent1Values,parent2Values,child1Values,child2Values);
+                    //System.out.println(child1Values[0]);
+                    //System.out.println(child2Values[0]);
+                    //System.out.println("--------");
                     break;
             }
             children.add(new Individual(child1Values));
@@ -262,12 +273,21 @@ public class EA {
 
     private double[] linearRank(int[] ranks)
     {
-        double mu = mean(ranks);
+        //System.out.println(ranks[0]);
+        //double mu = mean(ranks);
+        double mu = (double) ranks.length;
         double[] probabilities = new double[ranks.length];
         for(int i=0; i < probabilities.length; i++)
         {
             probabilities[i] = ((2-selectionPressure)/ mu) + ((2*ranks[i]*(selectionPressure-1))/(mu*(mu-1)));
         }
+
+        double sum = 0;
+        for(int k = 0; k < probabilities.length; k++)
+        {
+            sum+=probabilities[k];
+        }
+        //System.out.println(sum);
         return probabilities;
     }
 
@@ -285,12 +305,14 @@ public class EA {
 
     private double mean(int[] array)
     {
+
         double mean = 0.0;
-        for(int i=0;i < array.length;i++)
+        for(int i=0;                                                                                                                                                                                                                  i < array.length;i++)
         {
             mean += array[i];
         }
-        return (mean/ array.length);
+        System.out.println(mean/(double) array.length);
+        return (mean/ (double) array.length);
     }
 
     private Population selectPairs(Population currentPopulation, double[] probabilities)
@@ -375,17 +397,18 @@ public class EA {
     {
         ArrayList<Individual> parents = new ArrayList<>(2*numParents);
         for(int i=0; i < 2*numChildren; i+=2) {
-            double rand = Math.random();
+            double rand = Math.random() * probabilities[0];
             int j;
             for (j = 0; j < numParents; j++) {
-                if (rand > probabilities[j + 1] || j == numParents - 2) {
+                if ( j == numParents - 1 || rand > probabilities[j + 1]) {
                     parents.add(currentPopulation.getIndividual(j));
                     break;
                 }
             }
             int secondParent = -1;
             while (secondParent == -1 || secondParent == j) {
-                secondParent = calculateDistance(j, currentPopulation.getPopulation());
+                ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
+                secondParent = calculateDistance(j, top);
             }
             parents.add(currentPopulation.getIndividual(secondParent));
         }
@@ -407,11 +430,10 @@ public class EA {
     public int calculateDistance(int j, ArrayList<Individual> pop) {
         int curClosest = -1;
         double curDist = -1;
-        //System.out.println(pop.size());
         for (int i = 0; i < pop.size(); i++) {
             if (i != j) {
                 double distance = 0.0;
-                double[] parameters1 = pop.get(j).getParameters();
+                double[] parameters1 = pop.get(i).getParameters();
                 double[] parameters2 = pop.get(j).getParameters();
                 for (int k = 0; k < parameters1.length; k++) {
                     distance += Math.pow((parameters1[k] - parameters2[k]), 2);
@@ -422,8 +444,6 @@ public class EA {
                     curClosest = i;
                 }
             }
-
-
         }
         return curClosest;
     }

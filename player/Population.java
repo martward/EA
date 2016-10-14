@@ -45,7 +45,7 @@ public class Population {
             double[] array = new double[individual.getParameters().length];
             for(int i=0; i < array.length;i++)
             {
-                array[i] = individual.getParameters()[i];
+                array[i] = (int)individual.getParameters()[i];
             }
             individual.setFitness((double)evaluation.evaluate(array));
         }

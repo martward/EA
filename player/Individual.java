@@ -28,6 +28,7 @@ public class Individual {
         for (int i = 0; i < paramSize; i++)
         {
             parameters[i] = Math.random() * (paramLimits[1] - paramLimits[0]) + paramLimits[0];
+            //System.out.println(parameters[i]);
         }
     }
 
