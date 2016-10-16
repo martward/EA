@@ -45,7 +45,7 @@ public class Population {
             double[] array = new double[individual.getParameters().length];
             for(int i=0; i < array.length;i++)
             {
-                array[i] = (int)individual.getParameters()[i];
+                array[i] = individual.getParameters()[i];
             }
             individual.setFitness((double)evaluation.evaluate(array));
         }
@@ -95,5 +95,50 @@ public class Population {
     public ArrayList<Individual> getPopulation()
     {
         return population;
+    }
+
+    public void fitnessSharing(){
+        double sigma = 2;
+        for(int i=0; i < population.size(); i++)
+        {
+            double sum = 0;
+            for(int j = 0; j < population.size(); j++)
+            {
+                if(i!=j)
+                {
+                    sum+=share(i, j, sigma );
+                }
+            }
+            population.get(i).setFitness(population.get(i).getFitness()/sum);
+        }
+    }
+
+    private double calcDistance(int i, int j)
+    {
+        double distance = 0.0;
+        double[] parameters1 = population.get(i).getParameters();
+        double[] parameters2 = population.get(j).getParameters();
+        for (int k = 0; k < parameters1.length; k++) {
+            distance += Math.pow((parameters1[k] - parameters2[k]), 2);
+        }
+        return Math.sqrt(distance);
+    }
+
+    private double calcDistance2(int i, int j)
+    {
+        return Math.sqrt(Math.pow(population.get(i).getFitness() - population.get(j).getFitness(),2));
+    }
+
+    private double share(int i, int j, double sigma)
+    {
+        double distance = calcDistance(i,j);
+        if( distance <= sigma)
+        {
+            //System.out.println("jjeeeeeep");
+            return 1.0 - (distance/sigma);
+        } else
+        {
+            return 0.0;
+        }
     }
 }

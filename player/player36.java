@@ -95,7 +95,7 @@ public class player36 implements ContestSubmission
         else if(hasStructure)
         {
             //System.out.println("this");
-            populationSize = 360;
+            populationSize = 120;
             initMultiplier = 5;
             pMutate = 1.0;
             numParents = (populationSize/2) ;
@@ -135,7 +135,7 @@ public class player36 implements ContestSubmission
         Population children;
         double rate;
         //maxIterations = 2;
-        while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
+        while(its < maxIterations) {
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
             {
@@ -169,6 +169,11 @@ public class player36 implements ContestSubmission
             //System.out.println(population + "\n\n");
 
             population.evaluate();
+
+            if(its < maxIterations - 2)
+            {
+                population.fitnessSharing();
+            }
 
             //System.out.println(population.getIndividual(0));
 
