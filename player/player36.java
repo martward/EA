@@ -95,17 +95,17 @@ public class player36 implements ContestSubmission
         else if(hasStructure)
         {
             //System.out.println("this");
-            populationSize = 200;
-            initMultiplier = 15;
+            populationSize = 120;
+            initMultiplier = 10;
             pMutate = 1.0;
             numParents = (populationSize/2);
             numChildren = numParents;
             maxIterations = (evaluations_limit_ - populationSize*(initMultiplier-1))/(populationSize + numChildren)-2;
             singleParamMode = false;
-            algorithm = new EA(EA.SELECTION_TYPES.ADJECENT_PARENTS,
+            algorithm = new EA(EA.SELECTION_TYPES.DISTANCE,
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
-                    EA.RECOMBINATION_TYPES.NPOINTCROSSOVER,
-                    EA.KILL_TYPE.CHILD_VS_PARENT,
+                    EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
+                    EA.KILL_TYPE.WORST,
                     1.3,numParents, numChildren,pMutate, singleParamMode);
         } else{
             //System.out.println("this");
@@ -118,7 +118,7 @@ public class player36 implements ContestSubmission
             singleParamMode = false;
             algorithm = new EA(EA.SELECTION_TYPES.ADJECENT_PARENTS,
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
-                    EA.RECOMBINATION_TYPES.NPOINTCROSSOVER,
+                    EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                     EA.KILL_TYPE.CHILD_VS_PARENT,
                     1.8,numParents, numChildren,pMutate, singleParamMode);
         }
@@ -173,9 +173,9 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
 
-            if(its < maxIterations - 2)
+            if(its < maxIterations - 2 && !hasStructure)
             {
-                //population.fitnessSharing();
+                population.fitnessSharing();
             }
 
             //System.out.println(population.getIndividual(0));
