@@ -75,7 +75,7 @@ public class player36 implements ContestSubmission
         else if(isSeparable)
         {
             System.out.println("separable mode");
-            populationSize = 50;
+            populationSize = 100;
             numParents = 1;
             numChildren = populationSize - numParents;
             pMutate = 1.0;
@@ -90,19 +90,22 @@ public class player36 implements ContestSubmission
         }
         else
         {
-            populationSize = 100;
-            pMutate = 0.2;
-            numParents = (int) populationSize/4;
+            System.out.println("Other mode");
+            populationSize = 200;
+            pMutate = 1;
+            numParents = 64;
             numChildren = numParents;
-            maxIterations = evaluations_limit_/populationSize-1;
+            maxIterations = evaluations_limit_/(populationSize + numChildren) -1;
             singleParamMode = false;
 
-            algorithm = new EA(EA.SELECTION_TYPES.TOPN,
+            algorithm = new EA(EA.SELECTION_TYPES.ADJECENT_PARENTS,
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                     EA.RECOMBINATION_TYPES.NPOINTCROSSOVER,
-                    EA.KILL_TYPE.WORST,
+                    EA.KILL_TYPE.CHILD_VS_PARENT,
                     1.3,numParents, numChildren,pMutate, singleParamMode);
         }
+
+        System.out.println("Max iterations: " + maxIterations);
     }
 
 	public void run()
@@ -115,14 +118,19 @@ public class player36 implements ContestSubmission
         double rate;
         //maxIterations = 1;
         while(its < maxIterations && population.getIndividual(0).getFitness() < 10.0) {
+
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
             {
                 rate = Math.pow(0.0001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
             }
+            else if(!isSeparable)
+            {
+                rate = Math.pow(0.001, (double)its/(double)maxIterations);
+            }
             else
             {
-                rate = Math.pow(0.0001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.001, (double)its/(double)maxIterations);
             }
             //System.out.println("Rate: " + rate);
             //System.out.println("pop size: " + populationSize);
@@ -136,7 +144,7 @@ public class player36 implements ContestSubmission
             //System.out.println("Children: ");
             //System.out.println(children + "\n\n");
 
-            population = algorithm.kill(population, children);
+            population = algorithm.kill(population, children, selection);
             //System.out.println("After kill: ");
             //System.out.println(population + "\n\n");
 
