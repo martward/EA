@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,11 +20,11 @@ public class EA {
     private final RECOMBINATION_TYPES recombinationType;
 
     public enum SELECTION_TYPES {
-        LINEAR_RANK, EXPONENTIAL_RANK, TOPN, RANDTOPN, DISTANCE
+        LINEAR_RANK, EXPONENTIAL_RANK, TOPN, ADJECENT_PARENTS, RANDTOPN, DISTANCE
     }
 
     public enum MUTATION_TYPE {
-        REINIT, GAUSSIAN_NOISE
+        REINIT, GAUSSIAN_NOISE, NONE
     }
 
     public enum RECOMBINATION_TYPES {
@@ -33,7 +32,7 @@ public class EA {
     }
 
     public enum KILL_TYPE {
-        RANDOM, WORST
+        RANDOM, WORST, CHILD_VS_PARENT
     }
 
     public EA(SELECTION_TYPES selectionType,
@@ -73,11 +72,15 @@ public class EA {
                 //selection = diffusionSelection(currentPopulation,probs);
                 selection = selectPairs(currentPopulation,probs);
                 break;
+            case ADJECENT_PARENTS:
+                selection = selectAdjacentParents(currentPopulation);
+                break;
             case RANDTOPN:
                 selection = randTopN(currentPopulation);
                 break;
             case DISTANCE:
                 probs = linearRank(ranks);
+                //probs = exponentialRank(ranks);
                 //System.out.println("yaaay");
                 selection = diffusionSelection(currentPopulation, probs);
                 //selection = diffusionSelectionStochastic(currentPopulation,probs);
@@ -128,8 +131,7 @@ public class EA {
         return new Population(children, parents.getEvaluation());
     }
 
-
-    public Population kill(Population population, Population children)
+    public Population kill(Population population, Population children, Population parents)
     {
         switch(killType)
         {
@@ -152,6 +154,53 @@ public class EA {
                     populationIndividuals.set(populationIndividuals.size()-i-1, childrenIndividuals.get(i));
                 }
                 break;
+            case CHILD_VS_PARENT:
+                children.evaluate();
+                ArrayList<Individual> currentParents = parents.getPopulation();
+                ArrayList<Individual> currentChildren = children.getPopulation();
+                ArrayList<Individual> currentPopulation = population.getPopulation();
+
+                for (int i = 0; i < children.getPopSize(); i += 2)
+                {
+                    Individual child1 = currentChildren.get(i);
+                    Individual child2 = currentChildren.get(i+1);
+                    Individual parent1 = currentParents.get(i);
+                    Individual parent2 = currentParents.get(i+1);
+                    int parent1Index = currentPopulation.indexOf(parent1);
+                    int parent2Index = currentPopulation.indexOf(parent2);
+
+                    if (parent1Index == -1 || parent2Index == -1)
+                    {
+                        System.out.println("-1");
+                    }
+
+                    if (child1.distanceTo(parent1) < child1.distanceTo(parent2))
+                    {
+                        if (child1.getFitness() > parent1.getFitness())
+                        {
+                            currentPopulation.set(parent1Index, child1);
+                        }
+
+                        if (child2.getFitness() > parent2.getFitness())
+                        {
+                            currentPopulation.set(parent2Index, child2);
+                        }
+                    }
+                    else
+                    {
+                        if (child1.getFitness() > parent2.getFitness())
+                        {
+                            currentPopulation.set(parent2Index, child1);
+                        }
+
+                        if (child2.getFitness() > parent1.getFitness())
+                        {
+                            currentPopulation.set(parent1Index, child2);
+                        }
+                    }
+                }
+
+                return new Population(currentPopulation, population.getEvaluation());
         }
         return population;
     }
@@ -204,6 +253,8 @@ public class EA {
 
                     }
                 }
+                break;
+            case NONE:
         }
         return population;
     }
@@ -298,7 +349,7 @@ public class EA {
         for(int i=0; i < probabilities.length; i++)
         {
             //probabilities[i] = ((2-selectionPressure)/ mu) + ((2*ranks[i]*(selectionPressure-1))/(mu*(mu-1)));
-            probabilities[i] =  (1-Math.exp(-ranks[i]))/(1.0/ranks.length);
+            probabilities[i] =  (1-Math.exp(-ranks[i]))/15.0;
         }
         return probabilities;
     }
@@ -311,7 +362,6 @@ public class EA {
         {
             mean += array[i];
         }
-        System.out.println(mean/(double) array.length);
         return (mean/ (double) array.length);
     }
 
@@ -345,6 +395,28 @@ public class EA {
                 }
             }
             parents.add( currentPopulation.getIndividual(secondParent));
+        }
+        return new Population(parents, currentPopulation.getEvaluation());
+    }
+
+    public Population diffusionSelection(Population currentPopulation, double[] probabilities)
+    {
+        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+        for(int i=0; i < 2*numChildren; i+=2) {
+            double rand = Math.random() * probabilities[0];
+            int j;
+            for (j = 0; j < numParents; j++) {
+                if ( j == numParents - 1 || rand > probabilities[j + 1]) {
+                    parents.add(currentPopulation.getIndividual(j));
+                    break;
+                }
+            }
+            int secondParent = -1;
+            while (secondParent == -1 || secondParent == j) {
+                ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
+                secondParent = calculateDistance(j, top);
+            }
+            parents.add(currentPopulation.getIndividual(secondParent));
         }
         return new Population(parents, currentPopulation.getEvaluation());
     }
@@ -393,28 +465,64 @@ public class EA {
         return new Population(parents, currentPopulation.getEvaluation());
     }
 
-    public Population diffusionSelection(Population currentPopulation, double[] probabilities)
+
+
+    public Population selectAdjacentParents(Population population)
     {
-        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
-        for(int i=0; i < 2*numChildren; i+=2) {
-            double rand = Math.random() * probabilities[0];
-            int j;
-            for (j = 0; j < numParents; j++) {
-                if ( j == numParents - 1 || rand > probabilities[j + 1]) {
-                    parents.add(currentPopulation.getIndividual(j));
-                    break;
+        ArrayList<Individual> parents = new ArrayList<>();
+        for (int i = 0; i < numParents; i += 2)
+        {
+            int index = (int)(Math.random() * (population.getPopSize()-1));
+            Individual parent1;
+            if (i < numParents/2)
+            {
+                parent1 = population.getIndividual(i);
+                for (int j = 1; j < numParents; j++)
+                {
+                    if (parents.contains(parent1))
+                        parent1 = population.getIndividual(i+j);
+                    else
+                        break;
                 }
             }
-            int secondParent = -1;
-            while (secondParent == -1 || secondParent == j) {
-                ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
-                secondParent = calculateDistance(j, top);
+            else
+            {
+                parent1 = population.getIndividual(index);
+                //System.out.println("parent selection");
+                while(parents.contains(parent1))
+                {
+                    //System.out.println("looking for parent");
+                    index = (int)(Math.random() * (population.getPopSize()-1));
+                    parent1 = population.getIndividual(index);
+                }
             }
-            parents.add(currentPopulation.getIndividual(secondParent));
-        }
-    return new Population(parents, currentPopulation.getEvaluation());
-    }
 
+            Individual closestIndividual = null;
+
+            double distance = 10e10;
+            for (int j = 0; j < population.getPopSize(); j++)
+            {
+                Individual parent2 = population.getIndividual(j);
+                //System.out.println("parent selection");
+                while(parents.contains(parent2) || parent1 == parent2)
+                {
+                    //System.out.println("looking for parent");
+                    index = (int)(Math.random() * (population.getPopSize()-1));
+                    parent2 = population.getIndividual(index);
+                }
+
+                double currentDistance = parent1.distanceTo(parent2);
+                if( currentDistance < distance )
+                {
+                    closestIndividual = parent2;
+                    distance = currentDistance;
+                }
+            }
+            parents.add(parent1);
+            parents.add(closestIndividual);
+        }
+        return new Population(parents, population.getEvaluation());
+    }
 
     public double getMutateP()
     {
@@ -446,5 +554,4 @@ public class EA {
         }
         return curClosest;
     }
-
 }

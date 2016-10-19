@@ -60,4 +60,15 @@ public class Individual {
     public void replace(double params[]){
         parameters = params;
     }
+
+    public double distanceTo(Individual individual2)
+    {
+        double distance = 0.0;
+        double[] parameters2 = individual2.getParameters();
+        for(int i = 0; i < parameters.length; i++)
+        {
+            distance += Math.pow((parameters[i] - parameters2[i]), 2);
+        }
+        return Math.sqrt(distance);
+    }
 }

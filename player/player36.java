@@ -79,7 +79,7 @@ public class player36 implements ContestSubmission
         {
 
             System.out.println("separable mode");
-            populationSize = 50;
+            populationSize = 100;
             numParents = 1;
             numChildren = populationSize - numParents;
             pMutate = 1.0;
@@ -95,10 +95,10 @@ public class player36 implements ContestSubmission
         else if(hasStructure)
         {
             //System.out.println("this");
-            populationSize = 150;
+            populationSize = 240;
             initMultiplier = 10;
             pMutate = 1.0;
-            numParents = (populationSize/2) ;
+            numParents = (populationSize/2);
             numChildren = numParents;
             maxIterations = (evaluations_limit_ - populationSize*(initMultiplier-1))/(populationSize + numChildren)-2;
             singleParamMode = false;
@@ -108,11 +108,26 @@ public class player36 implements ContestSubmission
                     EA.KILL_TYPE.WORST,
                     2.0,numParents, numChildren,pMutate, singleParamMode);
         } else{
+            /*
+            //System.out.println("this");
+            populationSize = 100;
+            initMultiplier = 1;
+            pMutate = 1.0;
+            numParents = (populationSize/5) ;
+            numChildren = numParents;
+            maxIterations = (evaluations_limit_ - populationSize*(initMultiplier-1))/(populationSize + numChildren)-2;
+            singleParamMode = false;
+            algorithm = new EA(EA.SELECTION_TYPES.ADJECENT_PARENTS,
+                    EA.MUTATION_TYPE.GAUSSIAN_NOISE,
+                    EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
+                    EA.KILL_TYPE.CHILD_VS_PARENT,
+                    1.8,numParents, numChildren,pMutate, singleParamMode);
+        */
             //System.out.println("this");
             populationSize = 220;
             initMultiplier = 10;
             pMutate = 1.0;
-            numParents = (populationSize/2) ;
+            numParents = (populationSize/2);
             numChildren = numParents;
             maxIterations = (evaluations_limit_ - populationSize*(initMultiplier-1))/(populationSize + numChildren)-2;
             singleParamMode = false;
@@ -120,9 +135,8 @@ public class player36 implements ContestSubmission
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                     EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                     EA.KILL_TYPE.WORST,
-                    1.8,numParents, numChildren,pMutate, singleParamMode);
+                    2.0,numParents, numChildren,pMutate, singleParamMode);
         }
-
     }
 
 	public void run()
@@ -134,7 +148,8 @@ public class player36 implements ContestSubmission
         Population selection;
         Population children;
         double rate;
-        //maxIterations = 2;
+
+        //maxIterations = 1;
         while(its < maxIterations) {
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
@@ -143,10 +158,11 @@ public class player36 implements ContestSubmission
             }
             else if(hasStructure)
             {
-                rate = Math.pow(0.0000001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.000001, (double)its/(double)maxIterations);
             } else
             {
-                rate = Math.pow(0.00001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.000001, (double)its/(double)maxIterations);
+
             }
             //System.out.println("Rate: " + rate);
             //System.out.println("pop size: " + populationSize);
@@ -161,8 +177,7 @@ public class player36 implements ContestSubmission
             //System.out.println("Children: ");
             //System.out.println(children + "\n\n");
 
-
-            population = algorithm.kill(population, children);
+            population = algorithm.kill(population, children, selection);
 
             //System.out.println("After kill: ");
             //System.out.println(population + "\n\n");
@@ -173,7 +188,8 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
 
-            if(its < maxIterations - 2 && !isSeparable)
+
+            if(its < maxIterations - 2 && !isSeparable )
             {
                 population.fitnessSharing();
             }
