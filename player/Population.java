@@ -124,11 +124,6 @@ public class Population {
         return Math.sqrt(distance);
     }
 
-    private double calcDistance2(int i, int j)
-    {
-        return Math.sqrt(Math.pow(population.get(i).getFitness() - population.get(j).getFitness(),2));
-    }
-
     private double share(int i, int j, double sigma)
     {
         double distance = calcDistance(i,j);

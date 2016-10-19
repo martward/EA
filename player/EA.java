@@ -413,7 +413,6 @@ public class EA {
             parents.add(currentPopulation.getIndividual(secondParent));
         }
     return new Population(parents, currentPopulation.getEvaluation());
-
     }
 
 

@@ -95,8 +95,8 @@ public class player36 implements ContestSubmission
         else if(hasStructure)
         {
             //System.out.println("this");
-            populationSize = 120;
-            initMultiplier = 5;
+            populationSize = 150;
+            initMultiplier = 10;
             pMutate = 1.0;
             numParents = (populationSize/2) ;
             numChildren = numParents;
@@ -106,10 +106,10 @@ public class player36 implements ContestSubmission
                     EA.MUTATION_TYPE.GAUSSIAN_NOISE,
                     EA.RECOMBINATION_TYPES.SINGLE_ARITHMETIC,
                     EA.KILL_TYPE.WORST,
-                    1.8,numParents, numChildren,pMutate, singleParamMode);
+                    2.0,numParents, numChildren,pMutate, singleParamMode);
         } else{
             //System.out.println("this");
-            populationSize = 96;
+            populationSize = 220;
             initMultiplier = 10;
             pMutate = 1.0;
             numParents = (populationSize/2) ;
@@ -139,11 +139,14 @@ public class player36 implements ContestSubmission
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
             {
-                rate = Math.pow(0.0001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
+                rate = Math.pow(0.0000000001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
             }
-            else
+            else if(hasStructure)
             {
-                rate = Math.pow(0.0001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.0000001, (double)its/(double)maxIterations);
+            } else
+            {
+                rate = Math.pow(0.00001, (double)its/(double)maxIterations);
             }
             //System.out.println("Rate: " + rate);
             //System.out.println("pop size: " + populationSize);
@@ -170,10 +173,11 @@ public class player36 implements ContestSubmission
 
             population.evaluate();
 
-            if(its < maxIterations - 2)
+            if(its < maxIterations - 2 && !isSeparable)
             {
                 population.fitnessSharing();
             }
+
 
             //System.out.println(population.getIndividual(0));
 
