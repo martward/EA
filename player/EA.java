@@ -82,7 +82,7 @@ public class EA {
                 probs = linearRank(ranks);
                 //probs = exponentialRank(ranks);
                 //System.out.println("yaaay");
-                selection = diffusionSelection(currentPopulation, probs);
+                selection = diffusionSelection2(currentPopulation, probs);
                 //selection = diffusionSelectionStochastic(currentPopulation,probs);
                 break;
             default:
@@ -421,6 +421,71 @@ public class EA {
         return new Population(parents, currentPopulation.getEvaluation());
     }
 
+    public int calculateDistance(int j, ArrayList<Individual> pop) {
+        int curClosest = -1;
+        double curDist = -1;
+        for (int i = 0; i < pop.size(); i++) {
+            if (i != j) {
+                double distance = 0.0;
+                double[] parameters1 = pop.get(i).getParameters();
+                double[] parameters2 = pop.get(j).getParameters();
+                for (int k = 0; k < parameters1.length; k++) {
+                    distance += Math.pow((parameters1[k] - parameters2[k]), 2);
+                }
+                distance = Math.sqrt(distance);
+                if (distance > curDist) {
+                    curDist = distance;
+                    curClosest = i;
+                }
+            }
+        }
+        return curClosest;
+    }
+
+    public Population diffusionSelection2(Population currentPopulation, double[] probabilities)
+    {
+        mated m = new mated();
+        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
+        for(int i=0; i < 2*numChildren; i+=2) {
+            double rand = Math.random() * probabilities[0];
+            int j;
+            for (j = 0; j < numParents; j++) {
+                if ( j == numParents - 1 || rand > probabilities[j + 1]) {
+                    parents.add(currentPopulation.getIndividual(j));
+                    break;
+                }
+            }
+            int secondParent = -1;
+            while (secondParent == -1 || secondParent == j) {
+                ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
+                secondParent = calculateDistance2(j, top, m);
+            }
+            parents.add(currentPopulation.getIndividual(secondParent));
+        }
+        return new Population(parents, currentPopulation.getEvaluation());
+    }
+
+    public int calculateDistance2(int j, ArrayList<Individual> pop, mated m) {
+        int curClosest = -1;
+        double curDist = -1;
+        for (int i = 0; i < pop.size(); i++) {
+            if (i != j && !m.hasMated(i,j)) {
+                double distance = 0.0;
+                double[] parameters1 = pop.get(i).getParameters();
+                double[] parameters2 = pop.get(j).getParameters();
+                for (int k = 0; k < parameters1.length; k++) {
+                    distance += Math.pow((parameters1[k] - parameters2[k]), 2);
+                }
+                distance = Math.sqrt(distance);
+                if (distance > curDist) {
+                    curDist = distance;
+                    curClosest = i;
+                }
+            }
+        }
+        return curClosest;
+    }
+
     private Population randTopN(Population currentPopulation)
     {
         ArrayList<Individual> parents = new ArrayList<>(2*numParents);
@@ -524,34 +589,37 @@ public class EA {
         return new Population(parents, population.getEvaluation());
     }
 
-    public double getMutateP()
-    {
-        return pMutate;
-    }
 
-    public void setMutate(double p)
-    {
-        pMutate = p;
-    }
 
-    public int calculateDistance(int j, ArrayList<Individual> pop) {
-        int curClosest = -1;
-        double curDist = -1;
-        for (int i = 0; i < pop.size(); i++) {
-            if (i != j) {
-                double distance = 0.0;
-                double[] parameters1 = pop.get(i).getParameters();
-                double[] parameters2 = pop.get(j).getParameters();
-                for (int k = 0; k < parameters1.length; k++) {
-                    distance += Math.pow((parameters1[k] - parameters2[k]), 2);
-                }
-                distance = Math.sqrt(distance);
-                if (distance > curDist) {
-                    curDist = distance;
-                    curClosest = i;
+
+    public class mated{
+        ArrayList<Integer> parent1;
+        ArrayList<Integer> parent2;
+
+        public mated()
+        {
+            parent1 = new ArrayList<>();
+            parent2 = new ArrayList<>();
+        }
+
+        public void setMated(int i, int j)
+        {
+            parent1.add(i);
+            parent1.add(j);
+            parent2.add(i);
+            parent2.add(j);
+        }
+
+        public boolean hasMated(int i, int j)
+        {
+            for(int k = 0; k < parent1.size(); k++)
+            {
+                if(parent1.get(k) == i && parent2.get(k) == j)
+                {
+                    return true;
                 }
             }
+            return false;
         }
-        return curClosest;
     }
 }

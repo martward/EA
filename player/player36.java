@@ -154,14 +154,10 @@ public class player36 implements ContestSubmission
             //rate = 1. - (double)its/(double)maxIterations;
             if (singleParamMode)
             {
-                rate = Math.pow(0.0000000001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
-            }
-            else if(hasStructure)
+                rate = Math.pow(0.000000001, (double)(its%(maxIterations/10))/(double)(maxIterations/10));
+            }else
             {
-                rate = Math.pow(0.000001, (double)its/(double)maxIterations);
-            } else
-            {
-                rate = Math.pow(0.000001, (double)its/(double)maxIterations);
+                rate = Math.pow(0.00001, (double)its/(double)maxIterations);
 
             }
             //System.out.println("Rate: " + rate);
@@ -174,6 +170,7 @@ public class player36 implements ContestSubmission
 
 
             children = algorithm.recombine(selection);
+            //System.out.println(children.getPopSize());
             //System.out.println("Children: ");
             //System.out.println(children + "\n\n");
 
