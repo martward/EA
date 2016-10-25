@@ -90,7 +90,7 @@ public class player36 implements ContestSubmission
                     EA.KILL_TYPE.WORST,
                     2.0,numParents, numChildren,pMutate, singleParamMode);
         } else{
-            populationSize = 220;
+            populationSize = 120;
             initMultiplier = 10;
             pMutate = 1.0;
             numParents = (populationSize/2);
