@@ -58,9 +58,8 @@ public class player36 implements ContestSubmission
         System.out.println("Separable: " + (isSeparable ? "yes" : "no"));
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
 
-        if (isSeparable)
+        if (!isMultimodal)
         {
-            System.out.println("not multimodel mode");
             populationSize = 50;
             numParents = 1;
             numChildren = populationSize - numParents;
@@ -91,7 +90,7 @@ public class player36 implements ContestSubmission
                     EA.KILL_TYPE.WORST,
                     2.0,numParents, numChildren,pMutate, singleParamMode);
         } else{
-            populationSize = 120;
+            populationSize = 220;
             initMultiplier = 10;
             pMutate = 1.0;
             numParents = (populationSize/2);
