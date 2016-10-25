@@ -82,8 +82,7 @@ public class EA {
                 probs = linearRank(ranks);
                 //probs = exponentialRank(ranks);
                 //System.out.println("yaaay");
-                selection = diffusionSelection2(currentPopulation, probs);
-                //selection = diffusionSelectionStochastic(currentPopulation,probs);
+                selection = diffusionSelection(currentPopulation, probs);
                 break;
             default:
                 selection = currentPopulation.getTopN(numParents);
@@ -401,49 +400,6 @@ public class EA {
 
     public Population diffusionSelection(Population currentPopulation, double[] probabilities)
     {
-        ArrayList<Individual> parents = new ArrayList<>(2*numParents);
-        for(int i=0; i < 2*numChildren; i+=2) {
-            double rand = Math.random() * probabilities[0];
-            int j;
-            for (j = 0; j < numParents; j++) {
-                if ( j == numParents - 1 || rand > probabilities[j + 1]) {
-                    parents.add(currentPopulation.getIndividual(j));
-                    break;
-                }
-            }
-            int secondParent = -1;
-            while (secondParent == -1 || secondParent == j) {
-                ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
-                secondParent = calculateDistance(j, top);
-            }
-            parents.add(currentPopulation.getIndividual(secondParent));
-        }
-        return new Population(parents, currentPopulation.getEvaluation());
-    }
-
-    public int calculateDistance(int j, ArrayList<Individual> pop) {
-        int curClosest = -1;
-        double curDist = -1;
-        for (int i = 0; i < pop.size(); i++) {
-            if (i != j) {
-                double distance = 0.0;
-                double[] parameters1 = pop.get(i).getParameters();
-                double[] parameters2 = pop.get(j).getParameters();
-                for (int k = 0; k < parameters1.length; k++) {
-                    distance += Math.pow((parameters1[k] - parameters2[k]), 2);
-                }
-                distance = Math.sqrt(distance);
-                if (distance > curDist) {
-                    curDist = distance;
-                    curClosest = i;
-                }
-            }
-        }
-        return curClosest;
-    }
-
-    public Population diffusionSelection2(Population currentPopulation, double[] probabilities)
-    {
         mated m = new mated();
         ArrayList<Individual> parents = new ArrayList<>(2*numParents);
         for(int i=0; i < 2*numChildren; i+=2) {
@@ -458,14 +414,14 @@ public class EA {
             int secondParent = -1;
             while (secondParent == -1 || secondParent == j) {
                 ArrayList<Individual> top = new ArrayList<>(currentPopulation.getPopulation().subList(0, numParents));
-                secondParent = calculateDistance2(j, top, m);
+                secondParent = calculateDistance(j, top, m);
             }
             parents.add(currentPopulation.getIndividual(secondParent));
         }
         return new Population(parents, currentPopulation.getEvaluation());
     }
 
-    public int calculateDistance2(int j, ArrayList<Individual> pop, mated m) {
+    public int calculateDistance(int j, ArrayList<Individual> pop, mated m) {
         int curClosest = -1;
         double curDist = -1;
         for (int i = 0; i < pop.size(); i++) {
@@ -588,8 +544,6 @@ public class EA {
         }
         return new Population(parents, population.getEvaluation());
     }
-
-
 
 
     public class mated{
